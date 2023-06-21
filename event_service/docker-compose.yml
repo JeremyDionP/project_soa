@@ -1,0 +1,45 @@
+services:
+  EventSQL:
+    image: mysql
+    ports:
+      - 3310:3306
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+    volumes:
+      - ./EventSQL/:/docker-entrypoint-initdb.d
+    networks:
+      - EventNet
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 1s
+      retries: 10
+  EventSvc:
+    build: ./EventSvc/
+    image: event_svc
+    ports:
+      - 5509:5500
+    networks:
+      - ProjectNet
+      - EventNet
+    depends_on: 
+      EventSQL:
+        condition: service_healthy
+  EventCons:
+    build: ./EventCons/
+    image: event_cons
+    ports:
+      - 5510:5500
+    networks:
+      - ProjectNet
+      - EventNet
+    depends_on: 
+      EventSQL:
+        condition: service_healthy
+      EventSvc:
+        condition: service_started
+
+networks:
+  ProjectNet:
+    external: true
+  EventNet:

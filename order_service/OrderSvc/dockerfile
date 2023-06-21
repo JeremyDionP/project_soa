@@ -1,0 +1,14 @@
+FROM python:3.10.11-slim-bullseye
+
+WORKDIR /app
+COPY ./order.py .
+COPY ./order_producer.py .
+
+RUN python -m pip install flask
+RUN python -m pip install pika
+RUN python -m pip install mysql-connector-python
+RUN python -m pip install bcrypt
+
+EXPOSE 5500/tcp
+
+CMD python -m flask --app order run --host=0.0.0.0 -p 5500

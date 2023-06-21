@@ -1,0 +1,3 @@
+docker create --name ClientCons --network ProjectNet python_pm
+docker network connect ClientNet ClientCons
+docker start ClientCons

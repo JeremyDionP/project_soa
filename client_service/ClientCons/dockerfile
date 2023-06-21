@@ -1,0 +1,9 @@
+FROM python:3.10.11-slim-bullseye
+
+WORKDIR /app
+COPY ./client_consumer.py .
+
+RUN python -m pip install pika
+RUN python -m pip install mysql-connector-python
+
+CMD python ./client_consumer.py

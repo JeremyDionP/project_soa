@@ -1,0 +1,45 @@
+services:
+  ClientSQL:
+    image: mysql
+    ports:
+      - 3306:3306
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+    volumes:
+      - ./ClientSQL/:/docker-entrypoint-initdb.d
+    networks:
+      - ClientNet
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 1s
+      retries: 10
+  ClientSvc:
+    build: ./ClientSvc/
+    image: client_svc
+    ports:
+      - 5501:5500
+    networks:
+      - ProjectNet
+      - ClientNet
+    depends_on: 
+      ClientSQL:
+        condition: service_healthy
+  ClientCons:
+    build: ./ClientCons/
+    image: client_cons
+    ports:
+      - 5502:5500
+    networks:
+      - ProjectNet
+      - ClientNet
+    depends_on: 
+      ClientSQL:
+        condition: service_healthy
+      ClientSvc:
+        condition: service_started
+
+networks:
+  ProjectNet:
+    external: true
+  ClientNet:

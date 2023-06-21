@@ -1,0 +1,55 @@
+services:
+  OrderSQL:
+    image: mysql
+    ports:
+      - 3309:3306
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+    volumes:
+      - ./OrderSQL/:/docker-entrypoint-initdb.d
+    networks:
+      - OrderNet
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 1s
+      retries: 10
+  OrderSvc:
+    build: ./OrderSvc/
+    image: order_svc
+    ports:
+      - 5507:5500
+    networks:
+      - ProjectNet
+      - OrderNet
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5507/order/client"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    depends_on: 
+      OrderSQL:
+        condition: service_healthy
+  OrderCons:
+    build: ./OrderCons/
+    image: order_cons
+    ports:
+      - 5508:5500
+    networks:
+      - ProjectNet
+      - OrderNet
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5507/order/client"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    depends_on: 
+      OrderSQL:
+        condition: service_healthy
+      OrderSvc:
+        condition: service_healthy
+
+networks:
+  ProjectNet:
+    external: true
+  OrderNet:

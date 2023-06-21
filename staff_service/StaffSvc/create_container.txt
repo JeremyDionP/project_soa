@@ -1,0 +1,2 @@
+docker create --name ClientSvc --network ProjectNet -p 5500:5500 python_kfpm
+docker network connect ClientNet ClientSvc

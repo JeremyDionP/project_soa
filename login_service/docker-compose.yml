@@ -1,0 +1,50 @@
+services:
+  LoginSQL:
+    image: mysql
+    ports:
+      - 3308:3306
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+    volumes:
+      - ./LoginSQL/:/docker-entrypoint-initdb.d
+    networks:
+      - LoginNet
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 1s
+      retries: 10
+  LoginSvc:
+    build: ./LoginSvc/
+    image: login_svc
+    ports:
+      - 5505:5500
+    networks:
+      - ProjectNet
+      - LoginNet
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5505/login"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    depends_on: 
+      LoginSQL:
+        condition: service_healthy
+  LoginCons:
+    build: ./LoginCons/
+    image: login_cons
+    ports:
+      - 5506:5500
+    networks:
+      - ProjectNet
+      - LoginNet
+    depends_on: 
+      LoginSQL:
+        condition: service_healthy
+      LoginSvc:
+        condition: service_healthy
+
+networks:
+  ProjectNet:
+    external: true
+  LoginNet:

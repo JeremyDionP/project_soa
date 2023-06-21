@@ -1,0 +1,3 @@
+
+docker run --name ClientSQL --network ClientNet -d -p 3306:3306 -e MYSQL_ROOT_PASSWORD=root -v $(pwd):/docker-entrypoint-initdb.d mysql
+docker run --name ClientSQL -d -p 3306:3306 -e MYSQL_ROOT_PASSWORD=root -d -v '/mnt/c/Users/Jeremy Dion Purnama/Documents/Kuliah/Sem 6/Service Oriented Architecture/UAS/client_service/ClientSql/:/docker-entrypoint-initdb.d' --network=ClientNet mysql

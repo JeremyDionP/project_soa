@@ -1,0 +1,10 @@
+FROM python:3.10.11-slim-bullseye
+
+WORKDIR /app
+COPY ./login_consumer.py .
+
+RUN python -m pip install pika
+RUN python -m pip install mysql-connector-python
+RUN python -m pip install bcrypt
+
+CMD python ./login_consumer.py
