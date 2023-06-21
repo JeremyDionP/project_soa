@@ -379,4 +379,11 @@ URL: http://localhost:5509/
         "result": "Success"
       }
 
+/status/order_id [PUT]:
+  
+    Payload:
+      {
+        "status": 1
+      }
+
       
