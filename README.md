@@ -1,5 +1,4 @@
-# project_soa
-Client Service:
+# Client Service:
 
   /client [POST]:
   
@@ -67,7 +66,7 @@ Client Service:
       "role": 0
     }
  
-Staff Service:
+# Staff Service:
 
   /staff [POST]:
   
