@@ -1,6 +1,6 @@
 # Client Service: 
 
-URL:http://localhost:5501/
+URL:http://localhost:8081/
 
   /client [POST]:
   
@@ -71,7 +71,7 @@ URL:http://localhost:5501/
 
 # Staff Service: 
 
-URL: http://localhost:5503/
+URL: http://localhost:8083/
 
   /staff [POST]:
   
@@ -129,7 +129,7 @@ URL: http://localhost:5503/
 
 # Login Service 
 
-URL: http://localhost:5505/
+URL: http://localhost:8085/
 
   /login/staff [POST]:
 
@@ -179,7 +179,7 @@ URL: http://localhost:5505/
 
 # Order Service
 
-URL: http://localhost:5507/
+URL: http://localhost:8087/
 
   /order/type [GET]:
 
@@ -252,7 +252,7 @@ URL: http://localhost:5507/
 
 # Event Service
 
-URL: http://localhost:5509/
+URL: http://localhost:8089/
 
   /event [GET]:
 
@@ -383,6 +383,13 @@ URL: http://localhost:5509/
   
     Payload:
       {
+        "status": 1
+      }
+
+    Response:
+      {
+        "event": "updated_order",
+        "id": "1",
         "status": 1
       }
 
