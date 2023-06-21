@@ -1,4 +1,6 @@
-# Client Service: http://localhost:5501/
+# Client Service: 
+
+URL:http://localhost:5501/
 
   /client [POST]:
   
@@ -67,7 +69,9 @@
     }
 
 
-# Staff Service: http://localhost:5503/
+# Staff Service: 
+
+URL: http://localhost:5503/
 
   /staff [POST]:
   
@@ -123,7 +127,9 @@
       }
 
 
-# Login Service http://localhost:5505/
+# Login Service 
+
+URL: http://localhost:5505/
 
   /login/staff [POST]:
 
@@ -169,4 +175,208 @@
       {
         "error": "Wrong Username or Password"
       }
+
+
+# Order Service
+
+URL: http://localhost:5507/
+
+  /order/type [GET]:
+
+    Respose:
+      [
+        {
+            "id": 1,
+            "type": "A"
+        },
+        {
+            "id": 2,
+            "type": "B"
+        },
+        {
+            "id": 3,
+            "type": "C"
+        },
+        {
+            "id": 4,
+            "type": "D"
+        },
+        {
+            "id": 5,
+            "type": "E"
+        }
+      ]
+
+
+  /order [POST]:
+
+    payload:
+      {
+        "client_id": 1,
+        "event_type_id": 1,
+        "status": 0,
+        "contact": "0812",
+        "date": "2023-06-20 16:59:59",
+        "location": "UKP"
+      }
+      
+    Respose:
+      {
+        "id": 3
+      }
+  
+  /order [GET]:
+      
+    Respose:
+      [
+        {
+            "id": 1,
+            "client_id": 2,
+            "event_type_id": 3,
+            "status": 1,
+            "contact": "0812",
+            "date": "2023-06-20 16:59:59",
+            "location": "UKP"
+        },
+        {
+            "id": 2,
+            "client_id": 1,
+            "event_type_id": 1,
+            "status": 1,
+            "contact": "0812",
+            "date": "2023-06-20 16:59:59",
+            "location": "UKP"
+        }
+      ]
+
+
+# Event Service
+
+URL: http://localhost:5509/
+
+  /event [GET]:
+
+    Response:
+    [
+      {
+          "id": 2,
+          "order_id": 1,
+          "event_type_id": 3,
+          "time_start": "08:00",
+          "time_end": "10:00",
+          "description": "Terima Tamu",
+          "pic": 1
+      },
+      {
+          "id": 3,
+          "order_id": 1,
+          "event_type_id": 3,
+          "time_start": "10:00",
+          "time_end": "12:00",
+          "description": "Nyanyi Lagu",
+          "pic": 1
+      },
+      {
+          "id": 4,
+          "order_id": 1,
+          "event_type_id": 3,
+          "time_start": "12:00",
+          "time_end": "15:00",
+          "description": "Goodbye",
+          "pic": 1
+      },
+      {
+          "id": 5,
+          "order_id": 2,
+          "event_type_id": 1,
+          "time_start": "08:00",
+          "time_end": "10:00",
+          "description": "Terima Tamu 2",
+          "pic": 1
+      },
+      {
+          "id": 6,
+          "order_id": 2,
+          "event_type_id": 1,
+          "time_start": "10:00",
+          "time_end": "12:00",
+          "description": "Nyanyi Lagu 2",
+          "pic": 1
+      },
+      {
+          "id": 7,
+          "order_id": 2,
+          "event_type_id": 1,
+          "time_start": "12:00",
+          "time_end": "15:00",
+          "description": "Goodbye 2",
+          "pic": 1
+      }
+    ]
+
+  /event/order_id [GET]:
+
+    Response:
+      [
+        {
+            "id": 2,
+            "order_id": 1,
+            "event_type_id": 3,
+            "time_start": "08:00",
+            "time_end": "10:00",
+            "description": "Terima Tamu",
+            "pic": 1
+        },
+        {
+            "id": 3,
+            "order_id": 1,
+            "event_type_id": 3,
+            "time_start": "10:00",
+            "time_end": "12:00",
+            "description": "Nyanyi Lagu",
+            "pic": 1
+        },
+        {
+            "id": 4,
+            "order_id": 1,
+            "event_type_id": 3,
+            "time_start": "12:00",
+            "time_end": "15:00",
+            "description": "Goodbye",
+            "pic": 1
+        }
+      ]
+
+  /event/order_id [POST]:
+  
+    Payload:
+      [
+        {
+            "event_type_id": 1,
+            "time_start": "08:00",
+            "time_end": "10:00",
+            "description": "Terima Tamu 2",
+            "pic": 1
+        },
+        {
+            "event_type_id": 1,
+            "time_start": "10:00",
+            "time_end": "12:00",
+            "description": "Nyanyi Lagu 2",
+            "pic": 1
+        },
+        {
+            "event_type_id": 1,
+            "time_start": "12:00",
+            "time_end": "15:00",
+            "description": "Goodbye 2",
+            "pic": 1
+        }
+      ]
+
+    Response:
+      {
+        "result": "Success"
+      }
+
       
