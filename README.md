@@ -65,7 +65,8 @@
       "password": "$2b$12$XzHBQnEqXUa/7tuil.ne7.7GB/aVO5IQoINphXebv0Aotwc/oaNoG",
       "role": 0
     }
- 
+
+
 # Staff Service:
 
   /staff [POST]:
@@ -115,8 +116,57 @@
   /staff/id [GET]:
     
     Response:
-    {
-      "username": "Wendy",
-      "password": "123",
-      "role": 1
-    }
+      {
+        "username": "Wendy",
+        "password": "123",
+        "role": 1
+      }
+
+
+# Login Service
+
+  /login/staff [POST]:
+
+    payload:
+      {
+        "username": "Kelly",
+        "password": "123"
+      }
+      
+    Respose:
+      Kalau User dengan role staff gak ditemukan di database login
+      {
+        "error": "User Not Found"
+      }
+      Kalau Sukses
+      {
+        "result": "Success"
+      }
+      Kalau salah password
+      {
+        "error": "Wrong Username or Password"
+      }
+
+
+  /login/client [POST]:
+
+    payload:
+      {
+        "username": "Dion",
+        "password": "123"
+      }
+      
+    Respose:
+      Kalau User dengan role staff gak ditemukan di database login
+      {
+        "error": "User Not Found"
+      }
+      Kalau Sukses
+      {
+        "result": "Success"
+      }
+      Kalau salah password
+      {
+        "error": "Wrong Username or Password"
+      }
+      
