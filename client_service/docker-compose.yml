@@ -18,7 +18,7 @@ services:
     build: ./ClientSvc/
     image: client_svc
     ports:
-      - 5501:5500
+      - 8081:8080
     networks:
       - ProjectNet
       - ClientNet
@@ -29,7 +29,7 @@ services:
     build: ./ClientCons/
     image: client_cons
     ports:
-      - 5502:5500
+      - 8082:8080
     networks:
       - ProjectNet
       - ClientNet

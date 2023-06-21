@@ -9,6 +9,6 @@ RUN python -m pip install pika
 RUN python -m pip install mysql-connector-python
 RUN python -m pip install bcrypt
 
-EXPOSE 5500/tcp
+EXPOSE 8080/tcp
 
-CMD python -m flask --app client run --host=0.0.0.0 -p 5500
+CMD python -m flask --app client run --host=0.0.0.0 -p 8080

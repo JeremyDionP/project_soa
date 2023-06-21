@@ -18,7 +18,7 @@ services:
     build: ./LoginSvc/
     image: login_svc
     ports:
-      - 5505:5500
+      - 8085:8080
     networks:
       - ProjectNet
       - LoginNet
@@ -29,7 +29,7 @@ services:
     build: ./LoginCons/
     image: login_cons
     ports:
-      - 5506:5500
+      - 8086:8080
     networks:
       - ProjectNet
       - LoginNet

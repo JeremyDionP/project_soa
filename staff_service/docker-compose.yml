@@ -18,7 +18,7 @@ services:
     build: ./StaffSvc/
     image: staff_svc
     ports:
-      - 5503:5500
+      - 8083:8080
     networks:
       - ProjectNet
       - StaffNet
@@ -29,7 +29,7 @@ services:
     build: ./StaffCons/
     image: staff_cons
     ports:
-      - 5504:5500
+      - 8084:8080
     networks:
       - ProjectNet
       - StaffNet

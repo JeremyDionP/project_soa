@@ -18,7 +18,7 @@ services:
     build: ./OrderSvc/
     image: order_svc
     ports:
-      - 5507:5500
+      - 8087:8080
     networks:
       - ProjectNet
       - OrderNet
@@ -29,7 +29,7 @@ services:
     build: ./OrderCons/
     image: order_cons
     ports:
-      - 5508:5500
+      - 8088:8080
     networks:
       - ProjectNet
       - OrderNet
