@@ -1,4 +1,4 @@
-# Client Service:
+# Client Service: http://localhost:5501/
 
   /client [POST]:
   
@@ -67,7 +67,7 @@
     }
 
 
-# Staff Service:
+# Staff Service: http://localhost:5503/
 
   /staff [POST]:
   
@@ -123,7 +123,7 @@
       }
 
 
-# Login Service
+# Login Service http://localhost:5505/
 
   /login/staff [POST]:
 
