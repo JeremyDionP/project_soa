@@ -152,9 +152,10 @@ def client2(id):
                 # kalau data client ada, juga ambil menu dari client tsb.
                 for x in range(len(data_client)):
                     client_username = data_client[x]['username']
-                    if (client_username == clientUsername):
-                        duplicate = True
-                        break
+                    if (data_client[x]['id'] != clientID):
+                        if (client_username == clientUsername):
+                            duplicate = True
+                            break
 
             if not duplicate:
                 # ubah nama client dan clientPassword di database

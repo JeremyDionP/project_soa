@@ -155,9 +155,10 @@ def staff2(id):
                 # kalau data staff ada, juga ambil menu dari staff tsb.
                 for x in range(len(data_staff)):
                     staff_username = data_staff[x]['username']
-                    if (staff_username == staffUsername):
-                        duplicate = True
-                        break
+                    if (data_staff[x]['id'] != staffID):
+                        if (staff_username == staffUsername):
+                            duplicate = True
+                            break
 
             if not duplicate:
                 # ubah nama staff dan staffPassword di database
