@@ -22,11 +22,6 @@ services:
     networks:
       - ProjectNet
       - OrderNet
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:5507/order/client"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
     depends_on: 
       OrderSQL:
         condition: service_healthy
@@ -38,16 +33,11 @@ services:
     networks:
       - ProjectNet
       - OrderNet
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:5507/order/client"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
     depends_on: 
       OrderSQL:
         condition: service_healthy
       OrderSvc:
-        condition: service_healthy
+        condition: service_started
 
 networks:
   ProjectNet:

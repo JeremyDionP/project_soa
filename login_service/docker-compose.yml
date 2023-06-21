@@ -22,11 +22,6 @@ services:
     networks:
       - ProjectNet
       - LoginNet
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:5505/login"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
     depends_on: 
       LoginSQL:
         condition: service_healthy
@@ -42,7 +37,7 @@ services:
       LoginSQL:
         condition: service_healthy
       LoginSvc:
-        condition: service_healthy
+        condition: service_started
 
 networks:
   ProjectNet:
