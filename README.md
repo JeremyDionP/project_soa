@@ -242,6 +242,7 @@ URL: http://localhost:8087/
       ]
 
 
+  # INI UNTUK NAMBAH ORDER
   /order [POST]:
 
     payload:
@@ -258,7 +259,9 @@ URL: http://localhost:8087/
       {
         "id": 3
       }
-  
+
+
+  # INI UNTUK NAMPILIN SEMUA LIST ORDER
   /order [GET]:
       
     Respose:
@@ -283,11 +286,45 @@ URL: http://localhost:8087/
         }
       ]
 
+  # INI UNTUK NAMPILIN ORDER BY ID
+  /order/id [GET]:
+      
+    Respose:
+      [
+        {
+            "id": 1,
+            "client_id": 1,
+            "event_type_id": 3,
+            "status": 1,
+            "contact": "0812",
+            "date": "2023-06-20 16:59:59",
+            "location": "UKP"
+        },
+        {
+            "id": 2,
+            "client_id": 1,
+            "event_type_id": 1,
+            "status": 1,
+            "contact": "0812",
+            "date": "2023-06-20 16:59:59",
+            "location": "UKP"
+        }
+      ]
+
+  # INI UNTUK DELETE ORDER BY ID
+  /order/id [DELETE]:
+      
+    Respose:
+      {
+        "result": "data berhasil dihapus"
+      }
+
 
 # Event Service
 
 URL: http://localhost:8089/
 
+  # INI UNTUK GET SEMUA LIST EVENT
   /event [GET]:
 
     Response:
@@ -348,7 +385,8 @@ URL: http://localhost:8089/
       }
     ]
 
-  /event/order_id [GET]:
+  # INI BUAT NAMPILIN LIST EVENT BY ORDER ID
+  /event/order/order_id [GET]:
 
     Response:
       [
@@ -381,7 +419,8 @@ URL: http://localhost:8089/
         }
       ]
 
-  /event/order_id [POST]:
+  # INI BUAT NAMBAH EVENT PADA ORDER ID
+  /event/order/order_id [POST]:
   
     Payload:
       [
@@ -413,7 +452,9 @@ URL: http://localhost:8089/
         "result": "Success"
       }
 
-/status/order_id [PUT]:
+
+  # INI BUAT UPDATE STATUS DARI ORDERAN MENJADI DONE
+  /status/order_id [PUT]:
   
     Payload:
       {
@@ -426,5 +467,29 @@ URL: http://localhost:8089/
         "id": "1",
         "status": 1
       }
+
+  # INI BUAT EDIT EVENT BERDASARKAN ID EVENT
+  /event/id [PUT]:
+
+    Payload:
+      {
+        "order_id": 3,
+        "event_type_id": 1,
+        "time_start": "12:00",
+        "time_end": "15:00",
+        "description": "Goodbye Clientss",
+        "pic": 1
+      },
+
+  
+  # INI BUAT DELETE EVENT BY ID EVENT
+  /event/id [DELETE]:
+
+    Response:
+      {
+        "result": "Data berhasil dihapus"
+      }
+
+
 
       
