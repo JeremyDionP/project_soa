@@ -3,7 +3,20 @@ import mysql.connector, json, pika, logging
 from order_producer import *
 import bcrypt
 from datetime import date
+import time
 
+def retry_connect(host, user, password, database, max_attempts=10, delay=5):
+    attempt = 0
+    while attempt < max_attempts:
+        try:
+            db = mysql.connector.connect(host=host, user=user, password=password, database=database)
+            print("Connected to MySQL server successfully.")
+            return db
+        except mysql.connector.Error as err:
+            print(f"Failed to connect to MySQL server. Retrying in {delay} seconds...")
+            time.sleep(delay)
+            attempt += 1
+    raise Exception("Unable to connect to MySQL server after multiple attempts.")
 
 app = Flask(__name__)
 
@@ -26,7 +39,8 @@ def order():
     if HTTPRequest.method == 'GET':
         auth = HTTPRequest.authorization
         print(auth)
-        db = mysql.connector.connect(host="OrderSQL", user="root", password="root",database="order_soa")
+        # Connect to MySQL server with retries
+        db = retry_connect("OrderSQL", "root", "root", "order_soa")
         dbc = db.cursor(dictionary=True)
         # ambil data order
         sql = "SELECT * FROM clients"
@@ -63,7 +77,7 @@ def order3():
     if HTTPRequest.method == 'GET':
         auth = HTTPRequest.authorization
         print(auth)
-        db = mysql.connector.connect(host="OrderSQL", user="root", password="root",database="order_soa")
+        db = retry_connect("OrderSQL", "root", "root", "order_soa")
         dbc = db.cursor(dictionary=True)
         # ambil data order
         sql = "SELECT * FROM event_type"
@@ -101,7 +115,7 @@ def order2():
     if HTTPRequest.method == 'GET':
         auth = HTTPRequest.authorization
         print(auth)
-        db = mysql.connector.connect(host="OrderSQL", user="root", password="root",database="order_soa")
+        db = retry_connect("OrderSQL", "root", "root", "order_soa")
         dbc = db.cursor(dictionary=True)
         # ambil data order
         sql = "SELECT * FROM orders"
@@ -132,7 +146,7 @@ def order2():
         location = data['location']
 
         try:
-            db = mysql.connector.connect(host="OrderSQL", user="root", password="root",database="order_soa")
+            db = retry_connect("OrderSQL", "root", "root", "order_soa")
             dbc = db.cursor(dictionary=True)
             sql = "INSERT INTO orders (`client_id`,`event_type_id`,`status`,`contact`,`date`,`location`) VALUES (%s,%s,%s,%s,%s,%s)"
             dbc.execute(sql, [clientId,eventTypeId,status,contact,date,location] )

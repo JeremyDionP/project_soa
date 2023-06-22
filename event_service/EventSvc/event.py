@@ -2,6 +2,20 @@ from flask import Flask, render_template, Response as HTTPResponse, request as H
 import mysql.connector, json, pika, logging
 from event_producer import *
 import bcrypt
+import time
+
+def retry_connect(host, user, password, database, max_attempts=10, delay=5):
+    attempt = 0
+    while attempt < max_attempts:
+        try:
+            db = mysql.connector.connect(host=host, user=user, password=password, database=database)
+            print("Connected to MySQL server successfully.")
+            return db
+        except mysql.connector.Error as err:
+            print(f"Failed to connect to MySQL server. Retrying in {delay} seconds...")
+            time.sleep(delay)
+            attempt += 1
+    raise Exception("Unable to connect to MySQL server after multiple attempts.")
 
 app = Flask(__name__)
 
@@ -25,7 +39,8 @@ def event():
     if HTTPRequest.method == 'GET':
         auth = HTTPRequest.authorization
         print(auth)
-        db = mysql.connector.connect(host="EventSQL", user="root", password="root",database="event_soa")
+        # Connect to MySQL server with retries
+        db = retry_connect("EventSQL", "root", "root", "event_soa")
         dbc = db.cursor(dictionary=True)
         # ambil data event
         sql = "SELECT * FROM events"
@@ -138,8 +153,8 @@ def event2(id):
     if HTTPRequest.method == 'GET':
         if id.isnumeric():
             # ambil data event
-            db = mysql.connector.connect(host="EventSQL", user="root", password="root",database="event_soa")
-            dbc = db.cursor(dictionary=True)
+            # Connect to MySQL server with retries
+            db = retry_connect("EventSQL", "root", "root", "event_soa")
             sql = "SELECT * FROM events WHERE order_id = %s"
             dbc.execute(sql, [id])
             data_event = dbc.fetchall()
@@ -166,7 +181,8 @@ def event2(id):
         data = json.loads(HTTPRequest.data)
         # Iterate over each item in the list
         if id.isnumeric():
-            db = mysql.connector.connect(host="EventSQL", user="root", password="root",database="event_soa")
+            # Connect to MySQL server with retries
+            db = retry_connect("EventSQL", "root", "root", "event_soa")
             dbc = db.cursor(dictionary=True)
             try:    
                 # Start a transaction
@@ -309,7 +325,8 @@ def status(id):
     if HTTPRequest.method == 'PUT':
         data = json.loads(HTTPRequest.data)
         status = data['status']
-        db = mysql.connector.connect(host="EventSQL", user="root", password="root",database="event_soa")
+        # Connect to MySQL server with retries
+        db = retry_connect("EventSQL", "root", "root", "event_soa")
         dbc = db.cursor(dictionary=True)
         try:
             

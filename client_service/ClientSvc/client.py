@@ -2,9 +2,20 @@ from flask import Flask, render_template, Response as HTTPResponse, request as H
 import mysql.connector, json, pika, logging
 from client_producer import *
 import bcrypt
+import time
 
-db = mysql.connector.connect(host="ClientSQL", user="root", password="root",database="client_soa")
-dbc = db.cursor(dictionary=True)
+def retry_connect(host, user, password, database, max_attempts=10, delay=5):
+    attempt = 0
+    while attempt < max_attempts:
+        try:
+            db = mysql.connector.connect(host=host, user=user, password=password, database=database)
+            print("Connected to MySQL server successfully.")
+            return db
+        except mysql.connector.Error as err:
+            print(f"Failed to connect to MySQL server. Retrying in {delay} seconds...")
+            time.sleep(delay)
+            attempt += 1
+    raise Exception("Unable to connect to MySQL server after multiple attempts.")
 
 
 app = Flask(__name__)
@@ -30,6 +41,9 @@ def client():
         auth = HTTPRequest.authorization
         print(auth)
 
+        # Connect to MySQL server with retries
+        db = retry_connect("ClientSQL", "root", "root", "client_soa")
+        dbc = db.cursor(dictionary=True)
         # ambil data client
         sql = "SELECT * FROM user_client"
         dbc.execute(sql)
@@ -53,7 +67,9 @@ def client():
         role = data['role']
         duplicate = False
         hashed_password = bcrypt.hashpw(clientPassword.encode('utf-8'), bcrypt.gensalt())
-
+        # Connect to MySQL server with retries
+        db = retry_connect("ClientSQL", "root", "root", "client_soa")
+        dbc = db.cursor(dictionary=True)
         try:
             # ambil data client
             sql = "SELECT * FROM user_client"
@@ -117,6 +133,9 @@ def client2(id):
     if HTTPRequest.method == 'GET':
         if id.isnumeric():
             # ambil data client
+            # Connect to MySQL server with retries
+            db = retry_connect("ClientSQL", "root", "root", "client_soa")
+            dbc = db.cursor(dictionary=True)
             sql = "SELECT * FROM user_client WHERE id = %s"
             dbc.execute(sql, [id])
             data_client = dbc.fetchone()
@@ -143,7 +162,9 @@ def client2(id):
 
         messagelog = 'PUT id: ' + str(clientID) + ' | nama: ' + clientUsername + ' | clientPassword: ' + clientPassword + ' | role: ' + str(role)
         logging.warning("Received: %r" % messagelog)
-
+        # Connect to MySQL server with retries
+        db = retry_connect("ClientSQL", "root", "root", "client_soa")
+        dbc = db.cursor(dictionary=True)
         try:
             sql = "SELECT * FROM user_client"
             dbc.execute(sql)

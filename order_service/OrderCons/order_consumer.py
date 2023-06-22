@@ -1,11 +1,24 @@
 import pika, sys, os
 import mysql.connector,logging, json
+import time
 
+def retry_connect(host, user, password, database, max_attempts=10, delay=5):
+    attempt = 0
+    while attempt < max_attempts:
+        try:
+            db = mysql.connector.connect(host=host, user=user, password=password, database=database)
+            print("Connected to MySQL server successfully.")
+            return db
+        except mysql.connector.Error as err:
+            print(f"Failed to connect to MySQL server. Retrying in {delay} seconds...")
+            time.sleep(delay)
+            attempt += 1
+    raise Exception("Unable to connect to MySQL server after multiple attempts.")
 
-db = mysql.connector.connect(host="OrderSQL", user="root", password="root",database="order_soa")
+# Connect to MySQL server with retries
+db = retry_connect("OrderSQL", "root", "root", "order_soa")
 dbc = db.cursor(dictionary=True)
 
- 
 def main():
     def get_message(ch, method, properties, body):
 

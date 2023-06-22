@@ -2,9 +2,20 @@ from flask import Flask, render_template, Response as HTTPResponse, request as H
 import mysql.connector, json, pika, logging
 from staff_producer import *
 import bcrypt
+import time
 
-db = mysql.connector.connect(host="StaffSQL", user="root", password="root",database="staff_soa")
-dbc = db.cursor(dictionary=True)
+def retry_connect(host, user, password, database, max_attempts=10, delay=5):
+    attempt = 0
+    while attempt < max_attempts:
+        try:
+            db = mysql.connector.connect(host=host, user=user, password=password, database=database)
+            print("Connected to MySQL server successfully.")
+            return db
+        except mysql.connector.Error as err:
+            print(f"Failed to connect to MySQL server. Retrying in {delay} seconds...")
+            time.sleep(delay)
+            attempt += 1
+    raise Exception("Unable to connect to MySQL server after multiple attempts.")
 
 
 app = Flask(__name__)
@@ -30,6 +41,9 @@ def staff():
         auth = HTTPRequest.authorization
         print(auth)
 
+        # Connect to MySQL server with retries
+        db = retry_connect("StaffSQL", "root", "root", "staff_soa")
+        dbc = db.cursor(dictionary=True)
         # ambil data staff
         sql = "SELECT * FROM user_staff"
         dbc.execute(sql)
@@ -54,6 +68,9 @@ def staff():
         duplicate = False
         hashed_password = bcrypt.hashpw(staffPassword.encode('utf-8'), bcrypt.gensalt())
 
+        # Connect to MySQL server with retries
+        db = retry_connect("StaffSQL", "root", "root", "staff_soa")
+        dbc = db.cursor(dictionary=True)
         try:
             # ambil data staff
             sql = "SELECT * FROM user_staff"
@@ -119,6 +136,9 @@ def staff2(id):
     # ------------------------------------------------------
     if HTTPRequest.method == 'GET':
         if id.isnumeric():
+            # Connect to MySQL server with retries
+            db = retry_connect("StaffSQL", "root", "root", "staff_soa")
+            dbc = db.cursor(dictionary=True)
             # ambil data staff
             sql = "SELECT * FROM user_staff WHERE id = %s"
             dbc.execute(sql, [id])
@@ -143,7 +163,10 @@ def staff2(id):
         role = data['role']
         staffID = int(id)
         duplicate = False
-
+        
+        # Connect to MySQL server with retries
+        db = retry_connect("StaffSQL", "root", "root", "staff_soa")
+        dbc = db.cursor(dictionary=True)
         messagelog = 'PUT id: ' + str(staffID) + ' | nama: ' + staffUsername + ' | staffPassword: ' + staffPassword + ' | role: ' + str(role)
         logging.warning("Received: %r" % messagelog)
 

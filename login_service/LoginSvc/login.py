@@ -2,7 +2,20 @@ from flask import Flask, render_template, Response as HTTPResponse, request as H
 import mysql.connector, json, pika, logging
 from login_producer import *
 import bcrypt
+import time
 
+def retry_connect(host, user, password, database, max_attempts=10, delay=5):
+    attempt = 0
+    while attempt < max_attempts:
+        try:
+            db = mysql.connector.connect(host=host, user=user, password=password, database=database)
+            print("Connected to MySQL server successfully.")
+            return db
+        except mysql.connector.Error as err:
+            print(f"Failed to connect to MySQL server. Retrying in {delay} seconds...")
+            time.sleep(delay)
+            attempt += 1
+    raise Exception("Unable to connect to MySQL server after multiple attempts.")
 
 
 
@@ -27,7 +40,8 @@ def login3():
     if HTTPRequest.method == 'GET':
         auth = HTTPRequest.authorization
         print(auth)
-        db = mysql.connector.connect(host="LoginSQL",port='3306', user="root", password="root",database="login_soa")
+        # Connect to MySQL server with retries
+        db = retry_connect("LoginSQL", "root", "root", "login_soa")
         dbc = db.cursor(dictionary=True)
         # ambil data login
         sql = "SELECT * FROM users"
@@ -68,7 +82,7 @@ def login():
 
         try:
             # ambil data login staff
-            db = mysql.connector.connect(host="LoginSQL",port='3306', user="root", password="root",database="login_soa")
+            db = retry_connect("LoginSQL", "root", "root", "login_soa")
             dbc = db.cursor(dictionary=True)
             sql = "SELECT password FROM users WHERE username =%s AND `role`=%s"
             dbc.execute(sql, [loginUsername,role])
@@ -122,7 +136,7 @@ def login2():
 
         try:
             # ambil data login staff
-            db = mysql.connector.connect(host="LoginSQL",port='3306', user="root", password="root",database="login_soa")
+            db = retry_connect("LoginSQL", "root", "root", "login_soa")
             dbc = db.cursor(dictionary=True)
             sql = "SELECT password FROM users WHERE username =%s AND `role`=%s"
             dbc.execute(sql, [loginUsername,role])
