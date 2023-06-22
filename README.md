@@ -161,6 +161,7 @@ URL: http://localhost:8083/
 
 URL: http://localhost:8085/
 
+  # UNTUK LOGIN STAFF
   /login/staff [POST]:
 
     payload:
@@ -184,6 +185,7 @@ URL: http://localhost:8085/
       }
 
 
+  # UNTUK LOGIN CLIENT
   /login/client [POST]:
 
     payload:
@@ -211,6 +213,8 @@ URL: http://localhost:8085/
 
 URL: http://localhost:8087/
 
+
+  # UNTUK GET EVENT TYPE LIST
   /order/type [GET]:
 
     Respose:
