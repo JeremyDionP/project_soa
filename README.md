@@ -2,12 +2,14 @@
 
 URL:http://localhost:8081/
 
+  # INI BUAT REGISTER CLIENT
   /client [POST]:
   
     Payload:
       {
         "username": "Eric",
         "password": "123",
+        "email": "lalalalalala",
         "role": 0
       }
     
@@ -15,7 +17,8 @@ URL:http://localhost:8081/
       {
         "id": 4
       }
-      
+
+  # Ini buat get semua client
   /client [GET]:
   
     Response:
@@ -23,29 +26,35 @@ URL:http://localhost:8081/
         {
             "id": 1,
             "username": "Kelly",
+            "email": "lalalalalala",
             "password": "$2b$12$EFd9rmfU4rKTxoMEyI1Gz.Fa1svme/S9c01x0Em1xzuKS0IXg4QbS",
             "role": 0
         },
         {
             "id": 2,
             "username": "Dion",
+            "email": "lalalalalala",
             "password": "$2b$12$znyv5qAJk3Qr8wwPhhzgSOUiaemaOUVP3ZKGqaxRRzFpGBR9yw4PS",
             "role": 0
         },
         {
             "id": 3,
             "username": "Eric",
+            "email": "lalalalalala",
             "password": "$2b$12$im.oHxd8m7DkgiXz9jQpN.ptsVMKsjf8iuxByhgjatc8XGVqnD6X2",
             "role": 0
         }
     ]
-    
+
+
+  # INI BUAT UPDATE CLIENT SESUAI ID-NYA
   /client/id [PUT]:
   
     Payload:
     {
       "username": "Jen", -> Username gaboleh sama
       "password": "123",
+      "email": "lalalalalala",
       "role": 0
     }
     
@@ -57,7 +66,8 @@ URL:http://localhost:8081/
       "password": "123",
       "role": 0
     }
-  
+
+  # INI BUAT GET CLIENT BY ID
   /client/id [GET]:
   
     Response:
@@ -73,20 +83,23 @@ URL:http://localhost:8081/
 
 URL: http://localhost:8083/
 
+  # INI BUAT REGISTER STAFF
   /staff [POST]:
   
     Payload:
       {
         "username": "Eric",
+        "email": "lalalalalala",
         "password": "123",
-        "role": 0
+        "role": 1
       }
     
     Response:
       {
         "id": 4
       }
-      
+
+  # INI BUAT GET SEMUA LIST STAFF
   /staff [GET]:
   
     Response:
@@ -94,16 +107,20 @@ URL: http://localhost:8083/
           {
               "id": 1,
               "username": "Wendy",
+              "email": "lalalalalala",
               "password": "$2b$12$UacGq1taqEieY3SdSIDzOe3c3tUBpYNdYQl3iVLHfbOGP/BT4GN5m",
               "role": 1
           }
       ]
-    
+
+
+  # INI BUAT UPDATE STAFF BY ID STAFF  
   /staff/id [PUT]:
   
     Payload:
       {
         "username": "Wendy", -> Username gaboleh sama
+        "email": "lalalalalala",
         "password": "123",
         "role": 1
       }
@@ -116,15 +133,28 @@ URL: http://localhost:8083/
         "password": "123",
         "role": 1
       }
-  
+
+
+  # INI GET STAFF BY ID-NYA
   /staff/id [GET]:
     
     Response:
       {
         "username": "Wendy",
+        "email": "lalalalalala",
         "password": "123",
         "role": 1
       }
+
+
+  # INI UNTUK DELETE STAFF
+  /staff/id [DELETE]: 
+
+    Response:
+      {
+        "result": "Data berhasil dihapus"
+      }
+      
 
 
 # Login Service 
