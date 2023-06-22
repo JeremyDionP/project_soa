@@ -105,7 +105,7 @@ def order3():
     return resp
 
 @app.route('/order', methods = ['POST', 'GET'])
-def order2():
+def order4():
     jsondoc = ''
 
 
@@ -198,137 +198,79 @@ def order2():
 
 
 
-# @app.route('/order/<path:id>', methods = ['GET', 'PUT', 'DELETE'])
-# def order2(id):
-#     jsondoc = ''
+@app.route('/order/<path:id>', methods = ['GET', 'DELETE'])
+def order2(id):
+    jsondoc = ''
 
 
-#     # ------------------------------------------------------
-#     # HTTP method = GET
-#     # ------------------------------------------------------
-#     if HTTPRequest.method == 'GET':
-#         if id.isnumeric():
-#             # ambil data order
-#             sql = "SELECT * FROM user_order WHERE id = %s"
-#             dbc.execute(sql, [id])
-#             data_order = dbc.fetchone()
-#             # kalau data order ada, juga ambil menu dari order tsb.
-#             if data_order != None:
-#                 # sql = "SELECT * FROM order_menu WHERE idresto = %s"
-#                 # dbc.execute(sql, [id])
-#                 # data_menu = dbc.fetchall()
-#                 # data_order['produk'] = data_menu
-#                 jsondoc = json.dumps(data_order)
+    # ------------------------------------------------------
+    # HTTP method = GET
+    # ------------------------------------------------------
+    if HTTPRequest.method == 'GET':
+        if id.isnumeric():
+            # ambil data order
+            db = retry_connect("OrderSQL", "root", "root", "order_soa")
+            dbc = db.cursor(dictionary=True)
+            sql = "SELECT * FROM user_order WHERE id = %s"
+            dbc.execute(sql, [id])
+            data_order = dbc.fetchone()
+            # kalau data order ada, juga ambil menu dari order tsb.
+            if data_order != None:
+                # sql = "SELECT * FROM order_menu WHERE idresto = %s"
+                # dbc.execute(sql, [id])
+                # data_menu = dbc.fetchall()
+                # data_order['produk'] = data_menu
+                jsondoc = json.dumps(data_order)
 
-#                 status_code = 200  # The request has succeeded
-#             else: 
-#                 status_code = 404  # No resources found
-#         else: status_code = 400  # Bad Request
-
-
-#     # ------------------------------------------------------
-#     # HTTP method = POST
-#     # ------------------------------------------------------
-#     # elif HTTPRequest.method == 'POST':
-#     #     data = json.loads(HTTPRequest.data)
-#     #     orderUsername = data['username']
-#     #     orderPassword = data['password']
-#     #     role = 0
-#     #     hashed_password = bcrypt.hashpw(orderPassword.encode('utf-8'), bcrypt.gensalt())
-
-#     #     try:
-#     #         # simpan nama order, dan orderPassword ke database
-#     #         sql = "INSERT INTO user_order (id,username,password,role) VALUES (%s,%s,%s,%s)"
-#     #         dbc.execute(sql, [id,orderUsername,hashed_password,role] )
-#     #         db.commit()
-#     #         # dapatkan ID dari data order yang baru dimasukkan
-#     #         orderID = dbc.lastrowid
-#     #         data_order = {'id':orderID}
-#     #         jsondoc = json.dumps(data_order)
-
-#     #         # TODO: Kirim message ke order_service melalui RabbitMQ tentang adanya data order baru
+                status_code = 200  # The request has succeeded
+            else: 
+                status_code = 404  # No resources found
+        else: status_code = 400  # Bad Request
 
 
-#     #         status_code = 201
-#     #     # bila ada kesalahan saat insert data, buat XML dengan pesan error
-#     #     except mysql.connector.Error as err:
-#     #         status_code = 409
+    # ------------------------------------------------------
+    # HTTP method = DELETE
+    # ------------------------------------------------------
+    elif HTTPRequest.method == 'DELETE':
+        auth = HTTPRequest.authorization
+        print(auth)
+        id_to_delete = int(id)
 
+        db = retry_connect("OrderSQL", "root", "root", "order_soa")
+        dbc = db.cursor(dictionary=True)
+        try:
+            # ambil data order
+            sql = "DELETE FROM orders WHERE id = %s"
+            dbc.execute(sql, [id_to_delete])
+            db.commit()
+            dbc.close()
+            db.close()
 
-#     # ------------------------------------------------------
-#     # HTTP method = PUT
-#     # ------------------------------------------------------
-#     elif HTTPRequest.method == 'PUT':
-#         data = json.loads(HTTPRequest.data)
-#         orderUsername = data['username']
-#         orderPassword = data['password']
-#         # hashed_password = bcrypt.hashpw(orderPassword.encode('utf-8'), bcrypt.gensalt())
-#         role = data['role']
-#         orderID = int(id)
-#         duplicate = False
-
-#         messagelog = 'PUT id: ' + str(orderID) + ' | nama: ' + orderUsername + ' | orderPassword: ' + orderPassword + ' | role: ' + str(role)
-#         logging.warning("Received: %r" % messagelog)
-
-#         try:
-#             sql = "SELECT * FROM user_order"
-#             dbc.execute(sql)
-#             data_order = dbc.fetchall()
-#             if data_order != None:
-#                 # kalau data order ada, juga ambil menu dari order tsb.
-#                 for x in range(len(data_order)):
-#                     order_username = data_order[x]['username']
-#                     if (order_username == orderUsername):
-#                         duplicate = True
-#                         break
-
-#             if not duplicate:
-#                 # ubah nama order dan orderPassword di database
-#                 sql = "UPDATE user_order set `username`=%s, `password`=%s, `role`=%s where `id`=%s"
-#                 dbc.execute(sql, [orderUsername,orderPassword,role,orderID] )
-#                 db.commit()
-
-#                 # teruskan json yang berisi perubahan data order yang diterima dari Web UI
-#                 # ke RabbitMQ disertai dengan tambahan route = 'order.tenant.changed'
-#                 data_baru = {}
-#                 data_baru['event']  = "updated_tenant"
-#                 data_baru['id']     = orderID
-#                 data_baru['nama']   = orderUsername
-#                 data_baru['password'] = orderPassword
-#                 data_baru['role'] = role
-#                 jsondoc = json.dumps(data_baru)
-#                 publish_message(jsondoc,'order.tenant.changed')
-
-#                 status_code = 200
-
-#             else:
-#                 status_code = 400
-#                 data_error = {'error':'Username sudah ada'}
-#                 jsondoc = json.dumps(data_error)
-#         # bila ada kesalahan saat ubah data, buat XML dengan pesan error
-#         except mysql.connector.Error as err:
-#             status_code = 409
-#             data_error = {"error": str(err)}
-#             jsondoc = json.dumps(data_error)
-
-
-#     # ------------------------------------------------------
-#     # HTTP method = DELETE
-#     # ------------------------------------------------------
-#     elif HTTPRequest.method == 'DELETE':
-#         data = json.loads(HTTPRequest.data)
+            data = {}
+            data['event']  = 'delete_order'
+            data['id'] = id_to_delete
+            message = json.dumps(data)
+            publish_message(message,'order.delete')
+            status_code = 200  # The request has succeeded
+            data_order = {'result': 'Data Berhasil Dihapus'}
+            jsondoc = json.dumps(data_order)
+            
+        except mysql.connector.Error as err:
+            data_order = {'result': err}
+            jsondoc = json.dumps(data_order)
+            status_code = 409  # No resources found
 
 
 
 
-#     # ------------------------------------------------------
-#     # Kirimkan JSON yang sudah dibuat ke order
-#     # ------------------------------------------------------
-#     resp = HTTPResponse()
-#     if jsondoc !='': resp.response = jsondoc
-#     resp.headers['Content-Type'] = 'application/json'
-#     resp.status = status_code
-#     return resp
+    # ------------------------------------------------------
+    # Kirimkan JSON yang sudah dibuat ke order
+    # ------------------------------------------------------
+    resp = HTTPResponse()
+    if jsondoc !='': resp.response = jsondoc
+    resp.headers['Content-Type'] = 'application/json'
+    resp.status = status_code
+    return resp
 
 
 

@@ -201,16 +201,16 @@ ALTER TABLE `staffs`
 -- Constraints for table `event`
 --
 ALTER TABLE `events`
-  ADD CONSTRAINT `event_ibfk_1` FOREIGN KEY (`order_id`) REFERENCES `orders` (`id`),
-  ADD CONSTRAINT `event_ibfk_2` FOREIGN KEY (`event_type_id`) REFERENCES `event_type` (`id`),
-  ADD CONSTRAINT `event_ibfk_3` FOREIGN KEY (`pic`) REFERENCES `staffs` (`id`);
+  ADD CONSTRAINT `event_ibfk_1` FOREIGN KEY (`order_id`) REFERENCES `orders` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `event_ibfk_2` FOREIGN KEY (`event_type_id`) REFERENCES `event_type` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `event_ibfk_3` FOREIGN KEY (`pic`) REFERENCES `staffs` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints for table `orders`
 --
 ALTER TABLE `orders`
-  ADD CONSTRAINT `orders_ibfk_1` FOREIGN KEY (`client_id`) REFERENCES `clients` (`id`),
-  ADD CONSTRAINT `orders_ibfk_2` FOREIGN KEY (`event_type_id`) REFERENCES `event_type` (`id`);
+  ADD CONSTRAINT `orders_ibfk_1` FOREIGN KEY (`client_id`) REFERENCES `clients` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `orders_ibfk_2` FOREIGN KEY (`event_type_id`) REFERENCES `event_type` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints for table `rundown`

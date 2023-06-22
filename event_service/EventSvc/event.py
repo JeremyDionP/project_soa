@@ -50,84 +50,12 @@ def event():
         db.close()
 
         if data_event != None:
-            # kalau data event ada, juga ambil menu dari event tsb.
-            # for x in range(len(data_event)):
-            #     event_id = data_event[x]['id']
-            #     sql = "SELECT * FROM event_menu WHERE idresto = %s"
-            #     dbc.execute(sql, [event_id])
-            #     data_menu = dbc.fetchall()
-            #     data_event[x]['produk'] = data_menu
 
             status_code = 200  # The request has succeeded
             jsondoc = json.dumps(data_event)
 
         else: 
             status_code = 404  # No resources found
-
-
-    # ------------------------------------------------------
-    # HTTP method = POST
-    # ------------------------------------------------------
-    # elif HTTPRequest.method == 'POST':
-    #     data = json.loads(HTTPRequest.data)
-    #     eventUsername = data['username']
-    #     eventPassword = data['password']
-    #     role = data['role']
-    #     duplicate = False
-    #     # hashed_password = bcrypt.hashpw(eventPassword.encode('utf-8'), bcrypt.gensalt())
-
-    #     try:
-    #         # ambil data event
-    #         sql = "SELECT * FROM user_event"
-    #         dbc.execute(sql)
-    #         data_event = dbc.fetchall()
-    #         if data_event != None:
-    #             # kalau data event ada, juga ambil menu dari event tsb.
-    #             for x in range(len(data_event)):
-    #                 event_username = data_event[x]['username']
-    #                 if (event_username == eventUsername):
-    #                     duplicate = True
-    #                     break
-
-    #         if (not duplicate):
-    #             # simpan nama event, dan eventPassword ke database
-    #             sql = "INSERT INTO user_event (`username`,`password`,`role`) VALUES (%s,%s,%s)"
-    #             dbc.execute(sql, [eventUsername,eventPassword,role] )
-    #             db.commit()
-    #             # dapatkan ID dari data event yang baru dimasukkan
-    #             eventID = dbc.lastrowid
-    #             data_event = {'id':eventID}
-    #             jsondoc = json.dumps(data_event)
-
-    #             # simpan menu-menu untuk event di atas ke database
-    #             # for i in range(len(data['produk'])):
-    #             #     menu = data['produk'][i]['menu']
-    #             #     price = data['produk'][i]['price']
-
-    #             #     sql = "INSERT INTO event_menu (idresto,menu,price) VALUES (%s,%s,%s)"
-    #             #     dbc.execute(sql, [eventID,menu,price] )
-    #             #     db.commit()
-
-
-    #             # Publish event "new event" yang berisi data event yg baru.
-    #             # Data json yang dikirim sebagai message ke RabbitMQ adalah json asli yang
-    #             # diterima oleh route /event [POST] di atas dengan tambahan 2 key baru,
-    #             # yaitu 'event' dan eventID.
-    #             data['event']  = 'new_event'
-    #             data['event_id'] = eventID
-    #             message = json.dumps(data)
-    #             publish_message(message,'event.tenant.new')
-
-
-    #             status_code = 201
-    #         else:
-    #             data_error = {'error':'Username sudah ada'}
-    #             jsondoc = json.dumps(data_error)
-    #             status_code = 400
-    #     # bila ada kesalahan saat insert data, buat XML dengan pesan error
-    #     except mysql.connector.Error as err:
-    #         status_code = 409
-
 
     # ------------------------------------------------------
     # Kirimkan JSON yang sudah dibuat ke event
@@ -139,11 +67,86 @@ def event():
     return resp
 
 
-
-
-
-@app.route('/event/<path:id>', methods = ['GET', 'PUT', 'POST'])
+@app.route('/event/<path:id>', methods = ['PUT', 'DELETE'])
 def event2(id):
+    jsondoc = ''
+
+
+    # ------------------------------------------------------
+    # HTTP method = GET
+    # ------------------------------------------------------
+    if HTTPRequest.method == 'DELETE':
+        auth = HTTPRequest.authorization
+        print(auth)
+        id_to_delete = int(id)
+
+        db = retry_connect("EventSQL", "root", "root", "event_soa")
+        dbc = db.cursor(dictionary=True)
+        try:
+            # ambil data order
+            sql = "DELETE FROM events WHERE id = %s"
+            dbc.execute(sql, [id_to_delete])
+            db.commit()
+            dbc.close()
+            db.close()
+
+            data = {}
+            data['event']  = 'delete_event'
+            data['id'] = id_to_delete
+            message = json.dumps(data)
+            publish_message(message,'event.delete')
+            status_code = 200  # The request has succeeded
+            data_order = {'result': 'Data Berhasil Dihapus'}
+            jsondoc = json.dumps(data_order)
+            
+        except mysql.connector.Error as err:
+            data_order = {'result': err}
+            jsondoc = json.dumps(data_order)
+            status_code = 409  # No resources found
+
+
+    # ------------------------------------------------------
+    # HTTP method = POST
+    # ------------------------------------------------------
+    elif HTTPRequest.method == 'PUT':
+        data = json.loads(HTTPRequest.data)
+        event_id = int(id)
+        order_id = data['order_id']
+        event_type_id = data['event_type_id']
+        time_start = data['time_start']
+        time_end = data['time_end']
+        description = data['description']
+        pic = data['pic']
+
+        # Connect to MySQL server with retries
+        db = retry_connect("EventSQL", "root", "root", "event_soa")
+        dbc = db.cursor(dictionary=True)
+        try:
+            # ubah nama client dan clientPassword di database
+            sql = "UPDATE events set `order_id`=%s, `event_type_id`=%s, `time_start`=%s, `time_end`=%s, `description`=%s, `pic`=%s where `id`=%s"
+            dbc.execute(sql, [order_id,event_type_id,time_start,time_end,description,pic,event_id] )
+            db.commit()
+
+            data_error = {"result": "Data berhasil diubah"}
+            jsondoc = json.dumps(data_error)
+            status_code = 200
+        # bila ada kesalahan saat ubah data, buat XML dengan pesan error
+        except mysql.connector.Error as err:
+            status_code = 409
+            data_error = {"error": str(err)}
+            jsondoc = json.dumps(data_error)
+
+
+
+    resp = HTTPResponse()
+    if jsondoc !='': resp.response = jsondoc
+    resp.headers['Content-Type'] = 'application/json'
+    resp.status = status_code
+    return resp
+
+
+@app.route('/event/order/<path:id>', methods = ['GET', 'PUT', 'POST'])
+def eventOrder(id):
     jsondoc = ''
 
 
@@ -351,71 +354,6 @@ def status(id):
         
         dbc.close()
         db.close()
-
-
-    # ------------------------------------------------------
-    # HTTP method = POST
-    # ------------------------------------------------------
-    # elif HTTPRequest.method == 'POST':
-    #     data = json.loads(HTTPRequest.data)
-    #     eventUsername = data['username']
-    #     eventPassword = data['password']
-    #     role = data['role']
-    #     duplicate = False
-    #     # hashed_password = bcrypt.hashpw(eventPassword.encode('utf-8'), bcrypt.gensalt())
-
-    #     try:
-    #         # ambil data event
-    #         sql = "SELECT * FROM user_event"
-    #         dbc.execute(sql)
-    #         data_event = dbc.fetchall()
-    #         if data_event != None:
-    #             # kalau data event ada, juga ambil menu dari event tsb.
-    #             for x in range(len(data_event)):
-    #                 event_username = data_event[x]['username']
-    #                 if (event_username == eventUsername):
-    #                     duplicate = True
-    #                     break
-
-    #         if (not duplicate):
-    #             # simpan nama event, dan eventPassword ke database
-    #             sql = "INSERT INTO user_event (`username`,`password`,`role`) VALUES (%s,%s,%s)"
-    #             dbc.execute(sql, [eventUsername,eventPassword,role] )
-    #             db.commit()
-    #             # dapatkan ID dari data event yang baru dimasukkan
-    #             eventID = dbc.lastrowid
-    #             data_event = {'id':eventID}
-    #             jsondoc = json.dumps(data_event)
-
-    #             # simpan menu-menu untuk event di atas ke database
-    #             # for i in range(len(data['produk'])):
-    #             #     menu = data['produk'][i]['menu']
-    #             #     price = data['produk'][i]['price']
-
-    #             #     sql = "INSERT INTO event_menu (idresto,menu,price) VALUES (%s,%s,%s)"
-    #             #     dbc.execute(sql, [eventID,menu,price] )
-    #             #     db.commit()
-
-
-    #             # Publish event "new event" yang berisi data event yg baru.
-    #             # Data json yang dikirim sebagai message ke RabbitMQ adalah json asli yang
-    #             # diterima oleh route /event [POST] di atas dengan tambahan 2 key baru,
-    #             # yaitu 'event' dan eventID.
-    #             data['event']  = 'new_event'
-    #             data['event_id'] = eventID
-    #             message = json.dumps(data)
-    #             publish_message(message,'event.tenant.new')
-
-
-    #             status_code = 201
-    #         else:
-    #             data_error = {'error':'Username sudah ada'}
-    #             jsondoc = json.dumps(data_error)
-    #             status_code = 400
-    #     # bila ada kesalahan saat insert data, buat XML dengan pesan error
-    #     except mysql.connector.Error as err:
-    #         status_code = 409
-
 
     # ------------------------------------------------------
     # Kirimkan JSON yang sudah dibuat ke event

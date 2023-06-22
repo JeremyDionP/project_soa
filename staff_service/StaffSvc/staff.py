@@ -64,6 +64,7 @@ def staff():
         data = json.loads(HTTPRequest.data)
         staffUsername = data['username']
         staffPassword = data['password']
+        email = data['email']
         role = data['role']
         duplicate = False
         hashed_password = bcrypt.hashpw(staffPassword.encode('utf-8'), bcrypt.gensalt())
@@ -86,8 +87,8 @@ def staff():
 
             if (not duplicate):
                 # simpan nama staff, dan staffPassword ke database
-                sql = "INSERT INTO user_staff (`username`,`password`,`role`) VALUES (%s,%s,%s)"
-                dbc.execute(sql, [staffUsername,hashed_password,role] )
+                sql = "INSERT INTO user_staff (`username`,`email`,`password`,`role`) VALUES (%s,%s,%s,%s)"
+                dbc.execute(sql, [staffUsername,email,hashed_password,role] )
                 db.commit()
                 # dapatkan ID dari data staff yang baru dimasukkan
                 staffID = dbc.lastrowid
@@ -159,6 +160,7 @@ def staff2(id):
         data = json.loads(HTTPRequest.data)
         staffUsername = data['username']
         staffPassword = data['password']
+        email = data['email']
         hashed_password = bcrypt.hashpw(staffPassword.encode('utf-8'), bcrypt.gensalt())
         role = data['role']
         staffID = int(id)
@@ -185,8 +187,8 @@ def staff2(id):
 
             if not duplicate:
                 # ubah nama staff dan staffPassword di database
-                sql = "UPDATE user_staff set `username`=%s, `password`=%s, `role`=%s where `id`=%s"
-                dbc.execute(sql, [staffUsername,hashed_password,role,staffID] )
+                sql = "UPDATE user_staff set `username`=%s, `email`=%s, `password`=%s, `role`=%s where `id`=%s"
+                dbc.execute(sql, [staffUsername,email,hashed_password,role,staffID] )
                 db.commit()
 
                 # teruskan json yang berisi perubahan data staff yang diterima dari Web UI
@@ -195,8 +197,7 @@ def staff2(id):
                 data_baru['event']  = "updated_staff"
                 data_baru['id']     = staffID
                 data_baru['username']   = staffUsername
-                data_baru['password'] = staffPassword
-                data_baru['role'] = role
+                data_baru['email'] = email
                 jsondoc = json.dumps(data_baru)
                 publish_message(jsondoc,'staff.changed')
 
@@ -217,7 +218,33 @@ def staff2(id):
     # HTTP method = DELETE
     # ------------------------------------------------------
     elif HTTPRequest.method == 'DELETE':
-        data = json.loads(HTTPRequest.data)
+        auth = HTTPRequest.authorization
+        print(auth)
+        id_to_delete = int(id)
+
+        db = retry_connect("StaffSQL", "root", "root", "staff_soa")
+        dbc = db.cursor(dictionary=True)
+        try:
+            # ambil data order
+            sql = "DELETE FROM user_staff WHERE id = %s"
+            dbc.execute(sql, [id_to_delete])
+            db.commit()
+            dbc.close()
+            db.close()
+
+            data = {}
+            data['event']  = 'delete_staff'
+            data['id'] = id_to_delete
+            message = json.dumps(data)
+            publish_message(message,'staff.delete')
+            status_code = 200  # The request has succeeded
+            data_order = {'result': 'Data Berhasil Dihapus'}
+            jsondoc = json.dumps(data_order)
+            
+        except mysql.connector.Error as err:
+            data_order = {'result': err}
+            jsondoc = json.dumps(data_order)
+            status_code = 409  # No resources found
 
 
 

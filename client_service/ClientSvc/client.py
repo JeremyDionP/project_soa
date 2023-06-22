@@ -65,6 +65,7 @@ def client():
         clientUsername = data['username']
         clientPassword = data['password']
         role = data['role']
+        email = data['email']
         duplicate = False
         hashed_password = bcrypt.hashpw(clientPassword.encode('utf-8'), bcrypt.gensalt())
         # Connect to MySQL server with retries
@@ -85,8 +86,8 @@ def client():
 
             if (not duplicate):
                 # simpan nama client, dan clientPassword ke database
-                sql = "INSERT INTO user_client (`username`,`password`,`role`) VALUES (%s,%s,%s)"
-                dbc.execute(sql, [clientUsername,hashed_password,role] )
+                sql = "INSERT INTO user_client (`username`,`email`,`password`,`role`) VALUES (%s,%s,%s,%s)"
+                dbc.execute(sql, [clientUsername,email,hashed_password,role] )
                 db.commit()
                 # dapatkan ID dari data client yang baru dimasukkan
                 clientID = dbc.lastrowid
@@ -155,6 +156,7 @@ def client2(id):
         data = json.loads(HTTPRequest.data)
         clientUsername = data['username']
         clientPassword = data['password']
+        email = data['email']
         hashed_password = bcrypt.hashpw(clientPassword.encode('utf-8'), bcrypt.gensalt())
         role = data['role']
         clientID = int(id)
@@ -180,8 +182,8 @@ def client2(id):
 
             if not duplicate:
                 # ubah nama client dan clientPassword di database
-                sql = "UPDATE user_client set `username`=%s, `password`=%s, `role`=%s where `id`=%s"
-                dbc.execute(sql, [clientUsername,hashed_password,role,clientID] )
+                sql = "UPDATE user_client set `username`=%s, `email`=%s, `password`=%s, `role`=%s where `id`=%s"
+                dbc.execute(sql, [clientUsername,email,hashed_password,role,clientID] )
                 db.commit()
 
                 # teruskan json yang berisi perubahan data client yang diterima dari Web UI

@@ -48,6 +48,11 @@ def main():
             sql = "UPDATE staffs set `username`=%s where `id`=%s"
             dbc.execute(sql, [username,staffId] )
             db.commit()
+        if (event == 'delete_staff'):
+            staffId = data['id']
+            sql = "DELETE FROM staffs WHERE id = %s"
+            dbc.execute(sql, [staffId] )
+            db.commit()
         if (event == 'new_order'):
             clientId = data['client_id']
             eventTypeId = data['event_type_id']
@@ -59,6 +64,11 @@ def main():
             # Insert into orders table
             order_sql = "INSERT INTO orders (`client_id`,`event_type_id`,`status`,`contact`,`date`,`location`) VALUES (%s,%s,%s,%s,%s,%s)"
             dbc.execute(order_sql, [clientId, eventTypeId, status, contact, date, location])
+            db.commit()
+        if (event == 'delete_order'):
+            orderId = data['id']
+            sql = "DELETE FROM orders WHERE id = %s"
+            dbc.execute(sql, [orderId] )
             db.commit()
 
         # tampilkan pesan bahwa event sudah diproses
