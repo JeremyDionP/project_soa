@@ -32,6 +32,7 @@ USE `login_soa`;
 CREATE TABLE `users` (
   `id` int(11) NOT NULL,
   `username` varchar(255) NOT NULL,
+  `email` varchar(255) NOT NULL,
   `password` varchar(255) NOT NULL,
   `role` int(11) NOT NULL,
   `client_id` int(11) DEFAULT NULL,
