@@ -197,6 +197,7 @@ def staff2(id):
                 data_baru['event']  = "updated_staff"
                 data_baru['id']     = staffID
                 data_baru['username']   = staffUsername
+                data_baru['password']   = staffPassword
                 data_baru['email'] = email
                 jsondoc = json.dumps(data_baru)
                 publish_message(jsondoc,'staff.changed')

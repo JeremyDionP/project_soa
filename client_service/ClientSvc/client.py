@@ -193,6 +193,7 @@ def client2(id):
                 data_baru['id']     = clientID
                 data_baru['username']   = clientUsername
                 data_baru['password'] = clientPassword
+                data_baru['email'] = email
                 data_baru['role'] = role
                 jsondoc = json.dumps(data_baru)
                 publish_message(jsondoc,'client.changed')

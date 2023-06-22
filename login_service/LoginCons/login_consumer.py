@@ -29,27 +29,28 @@ def main():
         event = data['event']
         username = data['username']
         password = data['password']
+        email = data['email']
         role = data['role']
         hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
         if (event == 'new_client'):
             clientId = data['client_id']
-            sql = "INSERT INTO users (`username`,`password`,`role`, `client_id`) VALUES (%s,%s,%s,%s)"
-            dbc.execute(sql, [username,hashed_password,role,clientId] )
+            sql = "INSERT INTO users (`username`,`email`,`password`,`role`, `client_id`) VALUES (%s,%s,%s,%s,%s)"
+            dbc.execute(sql, [username,email,hashed_password,role,clientId] )
             db.commit()
         elif (event == 'new_staff'):
             staffId = data['staff_id']
-            sql = "INSERT INTO users (`username`,`password`,`role`, `staff_id`) VALUES (%s,%s,%s,%s)"
-            dbc.execute(sql, [username,hashed_password,role,staffId] )
+            sql = "INSERT INTO users (`username`,`email`,`password`,`role`, `staff_id`) VALUES (%s,%s,%s,%s,%s)"
+            dbc.execute(sql, [username,email,hashed_password,role,staffId] )
             db.commit()
         if (event == 'updated_client'):
             clientId = data['id']
-            sql = "UPDATE users set `username`=%s, `password`=%s, `role`=%s where `client_id`=%s"
-            dbc.execute(sql, [username,hashed_password,role,clientId] )
+            sql = "UPDATE users set `username`=%s,`email`=%s, `password`=%s, `role`=%s where `client_id`=%s"
+            dbc.execute(sql, [username,email,hashed_password,role,clientId] )
             db.commit()
         elif (event == 'updated_staff'):
             staffId = data['id']
-            sql = "UPDATE users set `username`=%s, `password`=%s, `role`=%s where `staff_id`=%s"
-            dbc.execute(sql, [username,hashed_password,role,staffId] )
+            sql = "UPDATE users set `username`=%s,`email`=%s, `password`=%s, `role`=%s where `staff_id`=%s"
+            dbc.execute(sql, [username,email,hashed_password,role,staffId] )
             db.commit()
         # tampilkan pesan bahwa event sudah diproses
         message = str(event)
