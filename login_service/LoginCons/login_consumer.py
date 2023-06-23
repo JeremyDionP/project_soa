@@ -72,7 +72,7 @@ def main():
             password = data['password']
             hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
             staffId = data['id']
-            sql = "UPDATE users set `username`=%s where `staff_id`=%s"
+            sql = "UPDATE users set `password`=%s where `staff_id`=%s"
             dbc.execute(sql, [hashed_password,staffId] )
             db.commit()
         # tampilkan pesan bahwa event sudah diproses
