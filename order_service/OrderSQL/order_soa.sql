@@ -101,12 +101,6 @@ ALTER TABLE `clients`
 ALTER TABLE `event_type`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
-INSERT INTO `event_type` (`id`, `type`) VALUES
-(1, 'A'),
-(2, 'B'),
-(3, 'C'),
-(4, 'D'),
-(5, 'E');
 --
 -- AUTO_INCREMENT for table `orders`
 --

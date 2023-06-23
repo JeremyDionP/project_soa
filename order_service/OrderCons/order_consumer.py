@@ -42,6 +42,22 @@ def main():
             sql = "UPDATE orders set `status`=%s where `id`=%s"
             dbc.execute(sql, [status,orderId] )
             db.commit()
+        if (event == 'new_type'):
+            event_type = data['event_type']
+            sql = "INSERT INTO `event_type` (`type`) VALUES (%s)"
+            dbc.execute(sql, [event_type] )
+            db.commit()
+        if (event == 'updated_type'):
+            event_type = data['event_type']
+            typeId = data['id']
+            sql = "UPDATE event_type set `type`=%s where `id`=%s"
+            dbc.execute(sql, [event_type,typeId] )
+            db.commit()
+        if (event == 'delete_type'):
+            typeId = data['id']
+            sql = "DELETE FROM event_type WHERE id = %s"
+            dbc.execute(sql, [typeId] )
+            db.commit()
         # tampilkan pesan bahwa event sudah diproses
         message = str(event)
         logging.warning("Received: %r" % message)
@@ -63,6 +79,7 @@ def main():
     new_queue_name = new_queue.method.queue
     channel.queue_bind(exchange='ProjectEX', queue=new_queue_name, routing_key='order.*')
     channel.queue_bind(exchange='ProjectEX', queue=new_queue_name, routing_key='client.*')
+    channel.queue_bind(exchange='ProjectEX', queue=new_queue_name, routing_key='event.type.*')
 
 
     # Ambil message dari RabbitMQ (bila ada)

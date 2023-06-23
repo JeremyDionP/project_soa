@@ -144,6 +144,145 @@ def event2(id):
     resp.status = status_code
     return resp
 
+@app.route('/event/type', methods = ['POST'])
+def addType():
+    jsondoc = ''
+
+    # ------------------------------------------------------
+    # HTTP method = POST
+    # ------------------------------------------------------
+    if HTTPRequest.method == 'POST':
+        data = json.loads(HTTPRequest.data)
+        event_type = data['event_type']
+        
+
+        # Connect to MySQL server with retries
+        db = retry_connect("EventSQL", "root", "root", "event_soa")
+        dbc = db.cursor(dictionary=True)
+        try:    
+
+            sql = "INSERT INTO `event_type` (`type`) VALUES (%s)"
+            dbc.execute(sql, [event_type])
+
+                    
+            # Commit the transaction if all insertions are successful
+            db.commit()
+
+            data_baru = {}
+            data_baru['event']  = "new_type"
+            data_baru['event_type']   = event_type
+            jsondoc = json.dumps(data_baru)
+            publish_message(jsondoc,'event.type.new')
+
+            result = {'result':"Success"}
+            jsondoc = json.dumps(result)
+            status_code = 201
+
+        except Exception as e:
+            result = {'result': e}
+            jsondoc = json.dumps(result)
+            status_code = 409
+
+        dbc.close()
+        db.close()
+
+
+
+    # ------------------------------------------------------
+    # Kirimkan JSON yang sudah dibuat ke event
+    # ------------------------------------------------------
+    resp = HTTPResponse()
+    if jsondoc !='': resp.response = jsondoc
+    resp.headers['Content-Type'] = 'application/json'
+    resp.status = status_code
+    return resp
+
+
+@app.route('/event/type/<path:id>', methods = ['PUT', 'DELETE'])
+def type(id):
+    jsondoc = ''
+
+
+    # ------------------------------------------------------
+    # HTTP method = PUT
+    # ------------------------------------------------------
+    if HTTPRequest.method == 'PUT':
+        data = json.loads(HTTPRequest.data)
+        event_type = data['event_type']
+        typeID = int(id)
+
+        db = retry_connect("EventSQL", "root", "root", "event_soa")
+        dbc = db.cursor(dictionary=True)
+
+        try:
+            # ubah nama event dan eventPassword di database
+            sql = "UPDATE event_type set `type`=%s where `id`=%s"
+            dbc.execute(sql, [event_type,typeID] )
+            db.commit()
+
+            # teruskan json yang berisi perubahan data event yang diterima dari Web UI
+            # ke RabbitMQ disertai dengan tambahan route = 'event.tenant.changed'
+            data_baru = {}
+            data_baru['event']  = "updated_type"
+            data_baru['id']     = typeID
+            data_baru['event_type']   = event_type
+            jsondoc = json.dumps(data_baru)
+            publish_message(jsondoc,'event.type.change')
+
+            status_code = 200
+
+            
+        # bila ada kesalahan saat ubah data, buat XML dengan pesan error
+        except mysql.connector.Error as err:
+            status_code = 409
+            data_error = {"error": str(err)}
+            jsondoc = json.dumps(data_error)
+
+
+    # ------------------------------------------------------
+    # HTTP method = DELETE
+    # ------------------------------------------------------
+    elif HTTPRequest.method == 'DELETE':
+        auth = HTTPRequest.authorization
+        print(auth)
+        id_to_delete = int(id)
+
+        db = retry_connect("EventSQL", "root", "root", "event_soa")
+        dbc = db.cursor(dictionary=True)
+        try:
+            # ambil data order
+            sql = "DELETE FROM event_type WHERE id = %s"
+            dbc.execute(sql, [id_to_delete])
+            db.commit()
+            dbc.close()
+            db.close()
+
+            data = {}
+            data['event']  = 'delete_type'
+            data['id'] = id_to_delete
+            message = json.dumps(data)
+            publish_message(message,'event.type.delete')
+
+            status_code = 200  # The request has succeeded
+            data_order = {'result': 'Data Berhasil Dihapus'}
+            jsondoc = json.dumps(data_order)
+            
+        except mysql.connector.Error as err:
+            data_order = {'result': err}
+            jsondoc = json.dumps(data_order)
+            status_code = 409  # No resources found
+
+
+
+    # ------------------------------------------------------
+    # Kirimkan JSON yang sudah dibuat ke event
+    # ------------------------------------------------------
+    resp = HTTPResponse()
+    if jsondoc !='': resp.response = jsondoc
+    resp.headers['Content-Type'] = 'application/json'
+    resp.status = status_code
+    return resp
+
 
 @app.route('/event/order/<path:id>', methods = ['GET', 'PUT', 'POST'])
 def eventOrder(id):
