@@ -1,3 +1,7 @@
+# Diagram Service
+![diagram_uas drawio](https://github.com/JeremyDionP/project_soa/assets/77277696/cd3e010e-a9e0-40e5-bcf0-9a427e59659b)
+
+
 # Client Service: 
 
 URL:http://localhost:8081/
