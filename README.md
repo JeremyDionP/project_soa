@@ -46,16 +46,27 @@ URL:http://localhost:8081/
         }
     ]
 
+  # INI BUAT UPDATE PASSWORD CLIENT SESUAI ID
+  /client/password/id [PUT]:
 
-  # INI BUAT UPDATE CLIENT SESUAI ID-NYA
+    Payload: 
+      {
+        "old_password": "123",
+        "new_password": "1234,
+      }
+
+    Response:
+      {
+        'result':'Success'
+      }
+  
+  # INI BUAT UPDATE USERNAME DAN EMAIL CLIENT SESUAI ID-NYA
   /client/id [PUT]:
   
     Payload:
     {
       "username": "Jen", -> Username gaboleh sama
-      "password": "123",
       "email": "lalalalalala",
-      "role": 0
     }
     
     Response:
@@ -114,15 +125,28 @@ URL: http://localhost:8083/
       ]
 
 
-  # INI BUAT UPDATE STAFF BY ID STAFF  
+  # INI BUAT UPDATE PASSWORD STAFF SESUAI ID
+  /client/password/id [PUT]:
+
+    Payload: 
+      {
+        "old_password": "123",
+        "new_password": "1234
+      }
+
+    Response:
+      {
+        'result':'Success'
+      }
+
+      
+  # INI BUAT UPDATE EMAIL DAN USERNAME STAFF BY ID STAFF  
   /staff/id [PUT]:
   
     Payload:
       {
         "username": "Wendy", -> Username gaboleh sama
-        "email": "lalalalalala",
-        "password": "123",
-        "role": 1
+        "email": "lalalalalala"
       }
     
     Response:
