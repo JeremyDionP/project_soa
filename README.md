@@ -2,12 +2,14 @@
 
 URL:http://localhost:8081/
 
+  # INI BUAT REGISTER CLIENT
   /client [POST]:
   
     Payload:
       {
         "username": "Eric",
         "password": "123",
+        "email": "lalalalalala",
         "role": 0
       }
     
@@ -15,7 +17,8 @@ URL:http://localhost:8081/
       {
         "id": 4
       }
-      
+
+  # Ini buat get semua client
   /client [GET]:
   
     Response:
@@ -23,30 +26,47 @@ URL:http://localhost:8081/
         {
             "id": 1,
             "username": "Kelly",
+            "email": "lalalalalala",
             "password": "$2b$12$EFd9rmfU4rKTxoMEyI1Gz.Fa1svme/S9c01x0Em1xzuKS0IXg4QbS",
             "role": 0
         },
         {
             "id": 2,
             "username": "Dion",
+            "email": "lalalalalala",
             "password": "$2b$12$znyv5qAJk3Qr8wwPhhzgSOUiaemaOUVP3ZKGqaxRRzFpGBR9yw4PS",
             "role": 0
         },
         {
             "id": 3,
             "username": "Eric",
+            "email": "lalalalalala",
             "password": "$2b$12$im.oHxd8m7DkgiXz9jQpN.ptsVMKsjf8iuxByhgjatc8XGVqnD6X2",
             "role": 0
         }
     ]
-    
+
+  # INI BUAT UPDATE PASSWORD CLIENT SESUAI ID
+  /client/password/id [PUT]:
+
+    Payload: 
+      {
+        "old_password": "123",
+        "new_password": "1234,
+      }
+
+    Response:
+      {
+        'result':'Success'
+      }
+  
+  # INI BUAT UPDATE USERNAME DAN EMAIL CLIENT SESUAI ID-NYA
   /client/id [PUT]:
   
     Payload:
     {
       "username": "Jen", -> Username gaboleh sama
-      "password": "123",
-      "role": 0
+      "email": "lalalalalala",
     }
     
     Response:
@@ -57,7 +77,8 @@ URL:http://localhost:8081/
       "password": "123",
       "role": 0
     }
-  
+
+  # INI BUAT GET CLIENT BY ID
   /client/id [GET]:
   
     Response:
@@ -73,20 +94,23 @@ URL:http://localhost:8081/
 
 URL: http://localhost:8083/
 
+  # INI BUAT REGISTER STAFF
   /staff [POST]:
   
     Payload:
       {
         "username": "Eric",
+        "email": "lalalalalala",
         "password": "123",
-        "role": 0
+        "role": 1
       }
     
     Response:
       {
         "id": 4
       }
-      
+
+  # INI BUAT GET SEMUA LIST STAFF
   /staff [GET]:
   
     Response:
@@ -94,18 +118,35 @@ URL: http://localhost:8083/
           {
               "id": 1,
               "username": "Wendy",
+              "email": "lalalalalala",
               "password": "$2b$12$UacGq1taqEieY3SdSIDzOe3c3tUBpYNdYQl3iVLHfbOGP/BT4GN5m",
               "role": 1
           }
       ]
-    
+
+
+  # INI BUAT UPDATE PASSWORD STAFF SESUAI ID
+  /client/password/id [PUT]:
+
+    Payload: 
+      {
+        "old_password": "123",
+        "new_password": "1234
+      }
+
+    Response:
+      {
+        'result':'Success'
+      }
+
+      
+  # INI BUAT UPDATE EMAIL DAN USERNAME STAFF BY ID STAFF  
   /staff/id [PUT]:
   
     Payload:
       {
         "username": "Wendy", -> Username gaboleh sama
-        "password": "123",
-        "role": 1
+        "email": "lalalalalala"
       }
     
     Response:
@@ -116,21 +157,35 @@ URL: http://localhost:8083/
         "password": "123",
         "role": 1
       }
-  
+
+
+  # INI GET STAFF BY ID-NYA
   /staff/id [GET]:
     
     Response:
       {
         "username": "Wendy",
+        "email": "lalalalalala",
         "password": "123",
         "role": 1
       }
+
+
+  # INI UNTUK DELETE STAFF
+  /staff/id [DELETE]: 
+
+    Response:
+      {
+        "result": "Data berhasil dihapus"
+      }
+      
 
 
 # Login Service 
 
 URL: http://localhost:8085/
 
+  # UNTUK LOGIN STAFF
   /login/staff [POST]:
 
     payload:
@@ -154,6 +209,7 @@ URL: http://localhost:8085/
       }
 
 
+  # UNTUK LOGIN CLIENT
   /login/client [POST]:
 
     payload:
@@ -181,6 +237,8 @@ URL: http://localhost:8085/
 
 URL: http://localhost:8087/
 
+
+  # UNTUK GET EVENT TYPE LIST
   /order/type [GET]:
 
     Respose:
@@ -208,6 +266,7 @@ URL: http://localhost:8087/
       ]
 
 
+  # INI UNTUK NAMBAH ORDER
   /order [POST]:
 
     payload:
@@ -224,7 +283,9 @@ URL: http://localhost:8087/
       {
         "id": 3
       }
-  
+
+
+  # INI UNTUK NAMPILIN SEMUA LIST ORDER
   /order [GET]:
       
     Respose:
@@ -249,11 +310,45 @@ URL: http://localhost:8087/
         }
       ]
 
+  # INI UNTUK NAMPILIN ORDER BY ID
+  /order/id [GET]:
+      
+    Respose:
+      [
+        {
+            "id": 1,
+            "client_id": 1,
+            "event_type_id": 3,
+            "status": 1,
+            "contact": "0812",
+            "date": "2023-06-20 16:59:59",
+            "location": "UKP"
+        },
+        {
+            "id": 2,
+            "client_id": 1,
+            "event_type_id": 1,
+            "status": 1,
+            "contact": "0812",
+            "date": "2023-06-20 16:59:59",
+            "location": "UKP"
+        }
+      ]
+
+  # INI UNTUK DELETE ORDER BY ID
+  /order/id [DELETE]:
+      
+    Respose:
+      {
+        "result": "data berhasil dihapus"
+      }
+
 
 # Event Service
 
 URL: http://localhost:8089/
 
+  # INI UNTUK GET SEMUA LIST EVENT
   /event [GET]:
 
     Response:
@@ -314,7 +409,8 @@ URL: http://localhost:8089/
       }
     ]
 
-  /event/order_id [GET]:
+  # INI BUAT NAMPILIN LIST EVENT BY ORDER ID
+  /event/order/order_id [GET]:
 
     Response:
       [
@@ -347,7 +443,8 @@ URL: http://localhost:8089/
         }
       ]
 
-  /event/order_id [POST]:
+  # INI BUAT NAMBAH EVENT PADA ORDER ID
+  /event/order/order_id [POST]:
   
     Payload:
       [
@@ -379,7 +476,9 @@ URL: http://localhost:8089/
         "result": "Success"
       }
 
-/status/order_id [PUT]:
+
+  # INI BUAT UPDATE STATUS DARI ORDERAN MENJADI DONE
+  /status/order_id [PUT]:
   
     Payload:
       {
@@ -392,5 +491,29 @@ URL: http://localhost:8089/
         "id": "1",
         "status": 1
       }
+
+  # INI BUAT EDIT EVENT BERDASARKAN ID EVENT
+  /event/id [PUT]:
+
+    Payload:
+      {
+        "order_id": 3,
+        "event_type_id": 1,
+        "time_start": "12:00",
+        "time_end": "15:00",
+        "description": "Goodbye Clientss",
+        "pic": 1
+      },
+
+  
+  # INI BUAT DELETE EVENT BY ID EVENT
+  /event/id [DELETE]:
+
+    Response:
+      {
+        "result": "Data berhasil dihapus"
+      }
+
+
 
       
