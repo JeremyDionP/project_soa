@@ -120,7 +120,80 @@ def client():
     return resp
 
 
+@app.route('/client/password/<path:id>', methods = ['PUT'])
+def password(id):
+    jsondoc = ''
 
+    # ------------------------------------------------------
+    # HTTP method = PUT
+    # ------------------------------------------------------
+    if HTTPRequest.method == 'PUT':
+        data = json.loads(HTTPRequest.data)
+        oldPassword = data['old_password']
+        newPassword = data['new_password']
+        hashed_password = bcrypt.hashpw(oldPassword.encode('utf-8'), bcrypt.gensalt())
+        new_hashed_password = bcrypt.hashpw(newPassword.encode('utf-8'), bcrypt.gensalt())
+
+        clientID = int(id)
+        
+        # Connect to MySQL server with retries
+        db = retry_connect("ClientSQL", "root", "root", "client_soa")
+        dbc = db.cursor(dictionary=True)
+        # messagelog = 'PUT id: ' + str(staffID) + ' | nama: ' + staffUsername + ' | staffPassword: ' + staffPassword + ' | role: ' + str(role)
+        # logging.warning("Received: %r" % messagelog)
+
+        try:
+            sql = "SELECT password FROM user_client WHERE id =%s"
+            dbc.execute(sql, [clientID])
+            data_staff = dbc.fetchone()
+
+
+
+            if data_staff is not None:
+                stored_hashed_password = data_staff['password']
+                verifyPassword = bcrypt.checkpw(oldPassword.encode('utf-8'), stored_hashed_password.encode('utf-8'))
+
+                if verifyPassword:
+                    sql = "UPDATE user_client set `password`=%s where `id`=%s"
+                    dbc.execute(sql, [new_hashed_password,clientID] )
+                    db.commit()
+                    dbc.close()
+                    db.close()
+
+                    data_baru = {}
+                    data_baru['event']  = "password_client"
+                    data_baru['id']     = clientID
+                    data_baru['password']   = newPassword
+                    jsondoc = json.dumps(data_baru)
+                    publish_message(jsondoc,'client.password')
+
+
+                    result = {'result':'Success'}
+                    jsondoc = json.dumps(result)
+                    status_code = 201
+                else:
+                    data_error = {'error':'Password Lama Salah'}
+                    jsondoc = json.dumps(data_error)
+                    status_code = 401
+            else:
+                data_error = {'error':'User Not Found'}
+                jsondoc = json.dumps(data_error)
+                status_code = 402
+
+        except mysql.connector.Error as err:
+            status_code = 409
+            data_error = {"error": str(err)}
+            jsondoc = json.dumps(data_error)
+
+            
+    # ------------------------------------------------------
+    # Kirimkan JSON yang sudah dibuat ke staff
+    # ------------------------------------------------------
+    resp = HTTPResponse()
+    if jsondoc !='': resp.response = jsondoc
+    resp.headers['Content-Type'] = 'application/json'
+    resp.status = status_code
+    return resp
 
 
 @app.route('/client/<path:id>', methods = ['GET', 'PUT', 'DELETE'])
@@ -155,15 +228,10 @@ def client2(id):
     elif HTTPRequest.method == 'PUT':
         data = json.loads(HTTPRequest.data)
         clientUsername = data['username']
-        clientPassword = data['password']
         email = data['email']
-        hashed_password = bcrypt.hashpw(clientPassword.encode('utf-8'), bcrypt.gensalt())
-        role = data['role']
         clientID = int(id)
         duplicate = False
 
-        messagelog = 'PUT id: ' + str(clientID) + ' | nama: ' + clientUsername + ' | clientPassword: ' + clientPassword + ' | role: ' + str(role)
-        logging.warning("Received: %r" % messagelog)
         # Connect to MySQL server with retries
         db = retry_connect("ClientSQL", "root", "root", "client_soa")
         dbc = db.cursor(dictionary=True)
@@ -182,8 +250,8 @@ def client2(id):
 
             if not duplicate:
                 # ubah nama client dan clientPassword di database
-                sql = "UPDATE user_client set `username`=%s, `email`=%s, `password`=%s, `role`=%s where `id`=%s"
-                dbc.execute(sql, [clientUsername,email,hashed_password,role,clientID] )
+                sql = "UPDATE user_client set `username`=%s, `email`=%s where `id`=%s"
+                dbc.execute(sql, [clientUsername,email,clientID] )
                 db.commit()
 
                 # teruskan json yang berisi perubahan data client yang diterima dari Web UI
@@ -192,9 +260,7 @@ def client2(id):
                 data_baru['event']  = "updated_client"
                 data_baru['id']     = clientID
                 data_baru['username']   = clientUsername
-                data_baru['password'] = clientPassword
                 data_baru['email'] = email
-                data_baru['role'] = role
                 jsondoc = json.dumps(data_baru)
                 publish_message(jsondoc,'client.changed')
 

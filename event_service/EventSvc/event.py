@@ -158,6 +158,7 @@ def eventOrder(id):
             # ambil data event
             # Connect to MySQL server with retries
             db = retry_connect("EventSQL", "root", "root", "event_soa")
+            dbc = db.cursor(dictionary=True)
             sql = "SELECT * FROM events WHERE order_id = %s"
             dbc.execute(sql, [id])
             data_event = dbc.fetchall()

@@ -27,30 +27,53 @@ def main():
         # Parse json data di dalam 'body' untuk mengambil data terkait event
         data = json.loads(body)
         event = data['event']
-        username = data['username']
-        password = data['password']
-        email = data['email']
-        role = data['role']
-        hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
         if (event == 'new_client'):
+            username = data['username']
+            password = data['password']
+            email = data['email']
+            role = data['role']
+            hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
             clientId = data['client_id']
             sql = "INSERT INTO users (`username`,`email`,`password`,`role`, `client_id`) VALUES (%s,%s,%s,%s,%s)"
             dbc.execute(sql, [username,email,hashed_password,role,clientId] )
             db.commit()
         elif (event == 'new_staff'):
+            username = data['username']
+            password = data['password']
+            email = data['email']
+            role = data['role']
+            hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
             staffId = data['staff_id']
             sql = "INSERT INTO users (`username`,`email`,`password`,`role`, `staff_id`) VALUES (%s,%s,%s,%s,%s)"
             dbc.execute(sql, [username,email,hashed_password,role,staffId] )
             db.commit()
         if (event == 'updated_client'):
+            username = data['username']
+            email = data['email']
             clientId = data['id']
-            sql = "UPDATE users set `username`=%s,`email`=%s, `password`=%s, `role`=%s where `client_id`=%s"
-            dbc.execute(sql, [username,email,hashed_password,role,clientId] )
+            sql = "UPDATE users set `username`=%s,`email`=%s where `client_id`=%s"
+            dbc.execute(sql, [username,email,clientId] )
             db.commit()
         elif (event == 'updated_staff'):
+            username = data['username']
+            email = data['email']
             staffId = data['id']
-            sql = "UPDATE users set `username`=%s,`email`=%s, `password`=%s, `role`=%s where `staff_id`=%s"
-            dbc.execute(sql, [username,email,hashed_password,role,staffId] )
+            sql = "UPDATE users set `username`=%s,`email`=%s where `staff_id`=%s"
+            dbc.execute(sql, [username,email,staffId] )
+            db.commit()
+        if (event == 'password_client'):
+            password = data['password']
+            hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+            clientId = data['id']
+            sql = "UPDATE users set `password`=%s where `client_id`=%s"
+            dbc.execute(sql, [hashed_password,clientId] )
+            db.commit()
+        elif (event == 'password_staff'):
+            password = data['password']
+            hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+            staffId = data['id']
+            sql = "UPDATE users set `username`=%s where `staff_id`=%s"
+            dbc.execute(sql, [hashed_password,staffId] )
             db.commit()
         # tampilkan pesan bahwa event sudah diproses
         message = str(event)

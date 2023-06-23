@@ -126,7 +126,79 @@ def staff():
 
 
 
+@app.route('/staff/password/<path:id>', methods = ['PUT'])
+def password(id):
+    jsondoc = ''
 
+    # ------------------------------------------------------
+    # HTTP method = PUT
+    # ------------------------------------------------------
+    if HTTPRequest.method == 'PUT':
+        data = json.loads(HTTPRequest.data)
+        oldPassword = data['old_password']
+        newPassword = data['new_password']
+        hashed_password = bcrypt.hashpw(oldPassword.encode('utf-8'), bcrypt.gensalt())
+        new_hashed_password = bcrypt.hashpw(newPassword.encode('utf-8'), bcrypt.gensalt())
+
+        staffID = int(id)
+        
+        # Connect to MySQL server with retries
+        db = retry_connect("StaffSQL", "root", "root", "staff_soa")
+        dbc = db.cursor(dictionary=True)
+        # messagelog = 'PUT id: ' + str(staffID) + ' | nama: ' + staffUsername + ' | staffPassword: ' + staffPassword + ' | role: ' + str(role)
+        # logging.warning("Received: %r" % messagelog)
+
+        try:
+            sql = "SELECT password FROM user_staff WHERE id =%s"
+            dbc.execute(sql, [staffID])
+            data_staff = dbc.fetchone()
+
+            if data_staff is not None:
+                stored_hashed_password = data_staff['password']
+                verifyPassword = bcrypt.checkpw(oldPassword.encode('utf-8'), stored_hashed_password.encode('utf-8'))
+
+                if verifyPassword:
+                    sql = "UPDATE user_staff set `password`=%s where `id`=%s"
+                    dbc.execute(sql, [new_hashed_password,staffID] )
+                    db.commit()
+                    
+                    dbc.close()
+                    db.close()
+
+                    data_baru = {}
+                    data_baru['event']  = "password_staff"
+                    data_baru['id']     = staffID
+                    data_baru['password']   = newPassword
+                    jsondoc = json.dumps(data_baru)
+                    publish_message(jsondoc,'staff.password')
+
+
+                    result = {'result':'Success'}
+                    jsondoc = json.dumps(result)
+                    status_code = 201
+                else:
+                    data_error = {'error':'Password Lama Salah'}
+                    jsondoc = json.dumps(data_error)
+                    status_code = 401
+            else:
+                data_error = {'error':'User Not Found'}
+                jsondoc = json.dumps(data_error)
+                status_code = 402
+
+        except mysql.connector.Error as err:
+            status_code = 409
+            data_error = {"error": str(err)}
+            jsondoc = json.dumps(data_error)
+
+
+    # ------------------------------------------------------
+    # Kirimkan JSON yang sudah dibuat ke staff
+    # ------------------------------------------------------
+    resp = HTTPResponse()
+    if jsondoc !='': resp.response = jsondoc
+    resp.headers['Content-Type'] = 'application/json'
+    resp.status = status_code
+    return resp
 
 @app.route('/staff/<path:id>', methods = ['GET', 'PUT', 'DELETE'])
 def staff2(id):
@@ -159,18 +231,18 @@ def staff2(id):
     elif HTTPRequest.method == 'PUT':
         data = json.loads(HTTPRequest.data)
         staffUsername = data['username']
-        staffPassword = data['password']
+        # staffPassword = data['password']
         email = data['email']
-        hashed_password = bcrypt.hashpw(staffPassword.encode('utf-8'), bcrypt.gensalt())
-        role = data['role']
+        # hashed_password = bcrypt.hashpw(staffPassword.encode('utf-8'), bcrypt.gensalt())
+        # role = data['role']
         staffID = int(id)
         duplicate = False
         
         # Connect to MySQL server with retries
         db = retry_connect("StaffSQL", "root", "root", "staff_soa")
         dbc = db.cursor(dictionary=True)
-        messagelog = 'PUT id: ' + str(staffID) + ' | nama: ' + staffUsername + ' | staffPassword: ' + staffPassword + ' | role: ' + str(role)
-        logging.warning("Received: %r" % messagelog)
+        # messagelog = 'PUT id: ' + str(staffID) + ' | nama: ' + staffUsername + ' | staffPassword: ' + staffPassword + ' | role: ' + str(role)
+        # logging.warning("Received: %r" % messagelog)
 
         try:
             sql = "SELECT * FROM user_staff"
@@ -187,8 +259,8 @@ def staff2(id):
 
             if not duplicate:
                 # ubah nama staff dan staffPassword di database
-                sql = "UPDATE user_staff set `username`=%s, `email`=%s, `password`=%s, `role`=%s where `id`=%s"
-                dbc.execute(sql, [staffUsername,email,hashed_password,role,staffID] )
+                sql = "UPDATE user_staff set `username`=%s, `email`=%s where `id`=%s"
+                dbc.execute(sql, [staffUsername,email,staffID] )
                 db.commit()
 
                 # teruskan json yang berisi perubahan data staff yang diterima dari Web UI
@@ -197,7 +269,6 @@ def staff2(id):
                 data_baru['event']  = "updated_staff"
                 data_baru['id']     = staffID
                 data_baru['username']   = staffUsername
-                data_baru['password']   = staffPassword
                 data_baru['email'] = email
                 jsondoc = json.dumps(data_baru)
                 publish_message(jsondoc,'staff.changed')
