@@ -515,5 +515,38 @@ URL: http://localhost:8089/
       }
 
 
+ # INI BUAT ADD EVENT TYPE 
+  /event/type [POST]:
+
+    Payload:
+      {
+        "event_type": "Pernikahan"
+      }
+
+
+    Response: 
+      {
+        "result": "sukses"
+      }
+
+
+   # INI BUAT EDIT EVENT TYPE ID
+  /event/type/id [PUT]:
+
+    Payload:
+      {
+        "event_type": "Ulang Tahun"
+      },
+
+  
+  # INI BUAT DELETE EVENT TYPE BY ID 
+  /event/type/id [DELETE]:
+
+    Response:
+      {
+        "result": "Data berhasil dihapus"
+      }
+
+
 
       
