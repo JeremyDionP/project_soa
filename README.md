@@ -1,3 +1,7 @@
+# Diagram Service
+![diagram_uas drawio](https://github.com/JeremyDionP/project_soa/assets/77277696/cd3e010e-a9e0-40e5-bcf0-9a427e59659b)
+
+
 # Client Service: 
 
 URL:http://localhost:8081/
@@ -508,6 +512,39 @@ URL: http://localhost:8089/
   
   # INI BUAT DELETE EVENT BY ID EVENT
   /event/id [DELETE]:
+
+    Response:
+      {
+        "result": "Data berhasil dihapus"
+      }
+
+
+ # INI BUAT ADD EVENT TYPE 
+  /event/type [POST]:
+
+    Payload:
+      {
+        "event_type": "Pernikahan"
+      }
+
+
+    Response: 
+      {
+        "result": "sukses"
+      }
+
+
+   # INI BUAT EDIT EVENT TYPE ID
+  /event/type/id [PUT]:
+
+    Payload:
+      {
+        "event_type": "Ulang Tahun"
+      },
+
+  
+  # INI BUAT DELETE EVENT TYPE BY ID 
+  /event/type/id [DELETE]:
 
     Response:
       {
