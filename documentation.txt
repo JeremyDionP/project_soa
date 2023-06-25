@@ -1,0 +1,38 @@
+1. LOGIN SERVICE (URL: http://localhost:8085/)
+    - /login/staff [POST] => Post login for staff
+    - /login/client [POST] => Post login for client
+
+2. CLIENT SERVICE (URL: http://localhost:8081/)
+    - /client [POST] => Post new client
+    - /client [GET] => Get all client
+    - /client/id [GET] => Get client by id
+    - /client/id [PUT] => Update client username or email by id
+    - /client/password/id [PUT] => Update client password by id
+
+3. STAFF SERVICE (URL: http://localhost:8083/)
+    - /staff [POST] => Post new staff
+    - /staff [GET] => Get all staff
+    - /staff/id [GET] => Get staff by id
+    - /staff/id [PUT] => Update staff username or email by id
+    - /staff/id [DELETE] => Delete staff by id
+    - /staff/password/id [PUT] => Update staff password by id
+
+4. EVENT SERVICE (URL: http://localhost:8089/)
+    - /event [GET] => Get all event/rundown
+    - /event/id [PUT] => Update event by event id
+    - /event/id [DELETE] => Delete event by event id
+    - /event/order/order_id [GET] => Get event/rundwon by order id
+    - /event/order/order_id [POST] => Post event/rundown by order id
+    - /event/type [POST] => Post new event type
+    - /event/type/id [PUT] => Update event type by event type id
+    - /event/type/id [DELETE] => Delete event type by event type id
+
+    - /status/order_id [PUT] => Update status order
+
+5. ORDER SERVICE (URL: http://localhost:8087/)
+    - /order [GET] => Get all order
+    - /order [POST] => Post new order
+    - /order/id [GET] => Get order by order id
+    - /order/id [DELETE] => Delete order by id
+    
+    - /order/type [GET] => Get event type list

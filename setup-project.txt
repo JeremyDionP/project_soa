@@ -1,0 +1,24 @@
+Link Github: https://github.com/JeremyDionP/project_soa
+
+/* ====== SETUP DOCKER ====== */
+1. Buka wsl
+
+2. Create Network-network yang Diperlukan dengan Menjalankan Command Berikut:
+    --> docker network create ProjectNet
+    --> docker network create ClientNet
+    --> docker network create StaffNet
+    --> docker network create LoginNet
+    --> docker network create OrderNet
+    --> docker network create EventNet
+
+3. Create Message Broker:
+    --> docker run --name ProjectMQ -h rbthost -p 8080:15672 -p 5672:5672 -d -e RABBITMQ_DEFAULT_USER=radmin -e RABBITMQ_DEFAULT_PASS=rpass --network=ProjectNet rabbitmq:3-management
+
+4. Run Docker Compose di Setiap Folder Service:
+    --> docker compose up
+
+/* ====== SETUP PROJECT UI ====== */
+1. Download file web_ui.zip
+2. Unzip file di folder htdocs xampp masing-masing
+3. Jalankan Apache saja di xampp
+4. Buka directory file tersebut di browser
